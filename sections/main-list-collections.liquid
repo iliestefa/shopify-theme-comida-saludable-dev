@@ -1,0 +1,143 @@
+<section
+  role="region"
+  aria-label="{{ section.settings.title | escape }}"
+  class="w-full py-8 lg:py-12"
+>
+  <div class="c-container flex flex-col gap-y-8">
+    {%- if section.settings.title != blank -%}
+      <h1 class="h2">
+        {{- section.settings.title -}}
+      </h1>
+    {%- endif -%}
+
+    {%- liquid
+      case section.settings.sort
+        when 'products_high', 'products_low'
+          assign collections = collections | sort: 'all_products_count'
+        when 'date', 'date_reversed'
+          assign collections = collections | sort: 'published_at'
+      endcase
+
+      if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+        assign collections = collections | reverse
+      endif
+
+      assign modulo_result = 28 | modulo: section.settings.columns_desktop
+      assign paginate_by = 30
+      if modulo_result == 0
+        assign paginate_by = 28
+      endif
+    -%}
+
+    {%- paginate collections by paginate_by -%}
+      {%- assign columns_desktop = 'lg:grid-cols-3' -%}
+      {%- case section.settings.columns_desktop -%}
+        {%- when 2 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-2' -%}
+        {%- when 3 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-3' -%}
+        {%- when 4 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-4' -%}
+        {%- when 5 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-5' -%}
+      {%- endcase -%}
+
+      {%- assign columns_mobile = 'grid-cols-1' -%}
+      {%- case section.settings.columns_mobile -%}
+        {%- when '1' -%}
+          {%- assign columns_mobile = 'grid-cols-1' -%}
+        {%- when '2' -%}
+          {%- assign columns_mobile = 'grid-cols-2' -%}
+      {%- endcase -%}
+
+      <ul
+        class="grid {{ columns_mobile }} md:grid-cols-2 {{ columns_desktop }} gap-x-3 md:gap-x-5 gap-y-5"
+        role="list"
+      >
+        {%- for collection in collections -%}
+          {%- assign priority = false -%}
+          {%- if forloop.index <= section.settings.columns_desktop -%}
+            {%- assign priority = true -%}
+          {%- endif -%}
+          <li>
+            {% render 'card-collection', card_collection: collection, priority: priority %}
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- render 'pagination', paginate: paginate -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collections list page",
+  "class": "section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "Collections"
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "options": [
+        {
+          "value": "alphabetical",
+          "label": "Alphabetically, A-Z"
+        },
+        {
+          "value": "alphabetical_reversed",
+          "label": "Alphabetically, Z-A"
+        },
+        {
+          "value": "date_reversed",
+          "label": "Date, new to old"
+        },
+        {
+          "value": "date",
+          "label": "Date, old to new"
+        },
+        {
+          "value": "products_high",
+          "label": "Product count, high to low"
+        },
+        {
+          "value": "products_low",
+          "label": "Product count, low to high"
+        }
+      ],
+      "default": "alphabetical",
+      "label": "Sort collections by:"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 3,
+      "label": "Number of columns on desktop"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        }
+      ],
+      "default": "2",
+      "label": "Number of columns on mobile"
+    }
+  ]
+}
+{% endschema %}

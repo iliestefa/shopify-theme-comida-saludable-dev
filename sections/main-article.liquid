@@ -1,0 +1,357 @@
+<article
+  class="w-full flex flex-col gap-y-8 lg:gap-y-12 {% if article.image == blank %} pt-8 lg:pt-12 {% endif %}"
+  itemscope
+  itemtype="http://schema.org/BlogPosting"
+>
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+      {%- when '@app' -%}
+        <div class="c-container max-w-[960px]">
+          {% render block %}
+        </div>
+      {%- when 'featured_image' -%}
+        {%- if article.image -%}
+          <div class="c-container desktop-down:!px-0" {{ block.shopify_attributes }}>
+            <meta itemprop="image" content="{{ article | image_url: width: 1920 | prepend: "https:" }}">
+            <div
+              class="w-full relative lg:h-[500px]"
+              itemprop="image"
+            >
+              {%- render 'image-element',
+                image: article.image,
+                class: 'w-full lg:h-full object-center object-cover',
+                preload: true,
+                max_width: 1500
+              -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+      {%- when 'title' -%}
+        <header
+          class="c-container max-w-[960px] flex flex-col gap-y-4"
+          {{ block.shopify_attributes }}
+        >
+          <h1
+            class="h2"
+            itemprop="headline"
+          >
+            {{- article.title | escape -}}
+          </h1>
+
+          {%- if block.settings.blog_show_date -%}
+            <span
+              class="body-5 uppercase"
+              itemprop="dateCreated datePublished"
+              content="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}"
+            >
+              {{- article.published_at | time_tag: format: 'date' -}}
+            </span>
+          {%- endif -%}
+
+          {%- if block.settings.blog_show_author -%}
+            <span class="body-5 uppercase font-bold" itemprop="author" itemscope itemtype="http://schema.org/Person">
+              <span itemprop="name">{{ article.author }}</span>
+            </span>
+          {%- endif -%}
+        </header>
+
+      {%- when 'content' -%}
+        <div
+          class="c-container max-w-[960px] body-3 leading-[2]"
+          itemprop="articleBody"
+          {{ block.shopify_attributes }}
+        >
+          {{- article.content -}}
+        </div>
+
+      {%- when 'share' -%}
+        <div
+          class="c-container max-w-[960px]"
+          {{ block.shopify_attributes }}
+        >
+          {%- render 'share-button', label: block.settings.share_label -%}
+        </div>
+    {%- endcase -%}
+  {%- endfor -%}
+
+  <div class="c-container max-w-[960px] flex place-content-center">
+    <a href="{{ blog.url }}" class="link animate-arrow flex flex-row gap-2 group">
+      {%- render 'icon-arrow', class: 'w-4 rotate-180' -%}
+      <span class="group-hover:underline underline-offset-4">
+        {{- 'blogs.article.back_to_blog' | t: title: blog.title -}}
+      </span>
+    </a>
+  </div>
+
+  {%- if blog.comments_enabled? -%}
+    <meta itemprop="commentCount" content="{{ article.comments_count }}">
+    <div class="w-full py-8 lg:py-12 bg-gray-200/50">
+      <div
+        id="comments"
+        class="c-container flex flex-col gap-y-5 max-w-[960px]"
+      >
+        {%- if article.comments_count > 0 -%}
+          {%- assign anchor_id = '#Comments-' | append: article.id -%}
+
+          <h2 id="Comments-{{ article.id }}" class="h4" tabindex="-1">
+            {{- 'blogs.article.comments' | t: count: article.comments_count -}}
+          </h2>
+
+          {% paginate article.comments by 5 %}
+            <div class="w-full flex flex-col gap-y-5">
+              {%- for comment in article.comments -%}
+                <article
+                  id="{{ comment.id }}"
+                  class="w-full flex flex-col gap-y-5 p-4 bg-white/50 rounded-[10px]"
+                  itemscope
+                  itemtype="https://schema.org/Comment"
+                >
+                  <div itemprop="text">
+                    {{- comment.content -}}
+                  </div>
+
+                  <footer class="flex flex-row items-center justify-end gap-3 body-5 uppercase">
+                    <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+                      <span itemprop="name">{{ comment.author }}</span>
+                    </div>
+                    <span>|</span>
+                    <span
+                      itemprop="datePublished"
+                      content="{{ comment.created_at | date: '%Y-%m-%dT%H:%M:%SZ' }}"
+                    >
+                      {{- comment.created_at | time_tag: format: 'date' -}}
+                    </span>
+                  </footer>
+                </article>
+              {%- endfor -%}
+
+              {%- render 'pagination', paginate: paginate, anchor: anchor_id -%}
+            </div>
+          {% endpaginate %}
+        {%- endif -%}
+
+        {% form 'new_comment', article, class: 'flex flex-col gap-y-5' %}
+          {%- liquid
+            assign post_message = 'blogs.article.success'
+            if blog.moderated? and comment.status == 'unapproved'
+              assign post_message = 'blogs.article.success_moderated'
+            endif
+          -%}
+
+          <h2 class="h3">{{ 'blogs.article.comment_form_title' | t }}</h2>
+
+          {%- if form.errors -%}
+            <div class="flex flex-col gap-y-2 text-error body-4" role="alert">
+              <div class="flex flex-row items-center gap-1" tabindex="-1" autofocus>
+                {%- render 'icon-error', class: 'w-4' -%}
+                <span>{{ 'templates.contact.form.error_heading' | t }}</span>
+              </div>
+
+              <ul class="list-disc list-inside flex flex-col gap-y-1">
+                {%- for field in form.errors -%}
+                  <li>
+                    <a href="#CommentForm-{{ field }}" class="richtext">
+                      {%- if form.errors.translated_fields[field] contains 'author' -%}
+                        {{ 'blogs.article.name' | t }}
+                      {%- elsif form.errors.translated_fields[field] contains 'body' -%}
+                        {{ 'blogs.article.message' | t }}
+                      {%- else -%}
+                        {{ form.errors.translated_fields[field] }}
+                      {%- endif -%}
+                      {{ form.errors.messages[field] }}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- elsif form.posted_successfully? -%}
+            <div
+              class="richtext text-success text-center body-2 flex flex-row items-center gap-1"
+              role="status"
+              tabindex="-1"
+              autofocus
+            >
+              {%- render 'icon-success' -%}
+              <span>{{ post_message | t }}</span>
+            </div>
+          {%- endif -%}
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-1 flex flex-col gap-y-1">
+              <label class="form__label" for="CommentForm-author">
+                {{- 'blogs.article.name' | t }}
+                <span aria-hidden="true">*</span></label
+              >
+
+              <input
+                type="text"
+                name="comment[author]"
+                id="CommentForm-author"
+                class="form__input bg-white/80"
+                autocomplete="name"
+                value="{{ form.author }}"
+                aria-required="true"
+                required
+                {% if form.errors contains 'author' %}
+                  aria-invalid="true"
+                  aria-describedby="CommentForm-author-error"
+                {% endif %}
+                placeholder="{{ 'blogs.article.name' | t }}"
+              >
+
+              {%- if form.errors contains 'author' -%}
+                <div
+                  class="text-error body-5 richtext flex flex-row items-center gap-1"
+                  id="CommentForm-author-error"
+                >
+                  {%- render 'icon-error', class: 'w-4' -%}
+                  <span class="form__message">
+                    {{- 'blogs.article.name' | t }}
+                    {{ form.errors.messages.author }}.</span
+                  >
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="col-span-1 flex flex-col gap-y-1">
+              <label class="form__label" for="CommentForm-email">
+                {{- 'blogs.article.email' | t }}
+                <span aria-hidden="true">*</span></label
+              >
+
+              <input
+                type="email"
+                name="comment[email]"
+                id="CommentForm-email"
+                autocomplete="email"
+                class="form__input bg-white/80"
+                value="{{ form.email }}"
+                autocorrect="off"
+                autocapitalize="off"
+                aria-required="true"
+                required
+                {% if form.errors contains 'email' %}
+                  aria-invalid="true"
+                  aria-describedby="CommentForm-email-error"
+                {% endif %}
+                placeholder="{{ 'blogs.article.email' | t }}"
+              >
+
+              {%- if form.errors contains 'email' -%}
+                <div class="text-error body-5 richtext flex flex-row items-center gap-1" id="CommentForm-email-error">
+                  {%- render 'icon-error', class: 'w-4' -%}
+                  <span>
+                    {{- 'blogs.article.email' | t }}
+                    {{ form.errors.messages.email }}.</span
+                  >
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="col-span-full">
+              <label class="form__label form__label" for="CommentForm-body">
+                {{- 'blogs.article.message' | t }}
+                <span aria-hidden="true">*</span></label
+              >
+
+              <textarea
+                rows="5"
+                name="comment[body]"
+                id="CommentForm-body"
+                class="form__input bg-white/80"
+                aria-required="true"
+                required
+                {% if form.errors contains 'body' %}
+                  aria-invalid="true"
+                  aria-describedby="CommentForm-body-error"
+                {% endif %}
+                placeholder="{{ 'blogs.article.message' | t }}"
+              >{{ form.body }}</textarea>
+
+              {%- if form.errors contains 'body' -%}
+                <small id="CommentForm-body-error">
+                  <span class="form__message">
+                    {%- render 'icon-error' -%}
+                    {{- 'blogs.article.message' | t }}
+                    {{ form.errors.messages.body }}.</span
+                  >
+                </small>
+              {%- endif -%}
+            </div>
+          </div>
+
+          {%- if blog.moderated? -%}
+            <p class="body-4 text-orange-500">{{ 'blogs.article.moderated' | t }}</p>
+          {%- endif -%}
+
+          <button type="submit" class="button-primary w-max">{{ 'blogs.article.post' | t }}</button>
+        {% endform %}
+      </div>
+    </div>
+  {%- endif -%}
+</article>
+
+{% schema %}
+{
+  "name": "Blog Post",
+  "tag": "section",
+  "class": "section",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "featured_image",
+      "name": "Featured Image",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "blog_show_date",
+          "default": true,
+          "label": "Show date"
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_author",
+          "default": true,
+          "label": "Show author"
+        }
+      ]
+    },
+    {
+      "type": "content",
+      "name": "Content",
+      "limit": 1
+    },
+    {
+      "type": "share",
+      "name": "Share",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "share_label",
+          "label": "Text",
+          "default": "Share"
+        },
+        {
+          "type": "paragraph",
+          "content": "If you include a link in social media posts, the page’s featured image will be shown as the preview image. [Learn more](https://help.shopify.com/manual/online-store/images/showing-social-media-thumbnail-images)."
+        },
+        {
+          "type": "paragraph",
+          "content": "A store title and description are included with the preview image. [Learn more](https://help.shopify.com/manual/promoting-marketing/seo/adding-keywords#set-a-title-and-description-for-your-online-store)."
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

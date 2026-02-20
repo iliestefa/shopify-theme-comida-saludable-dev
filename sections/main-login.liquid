@@ -1,0 +1,140 @@
+{%- if section.settings.enable_shop_login_button == false -%}
+  {%- assign hide_shop_login_button = true -%}
+{%- endif -%}
+
+<section
+  id="login"
+  class="c-container py-8 lg:py-12 flex flex-col gap-y-5 max-w-[600px]"
+  role="region"
+  aria-label="{{ 'customer.login_page.title' | t }}"
+>
+  <h1 class="h2 text-center">
+    {{- 'customer.login_page.title' | t -}}
+  </h1>
+
+  {%- if shop.features.login_with_shop_classic_customer_accounts? -%}
+    <section name="sign-in-with-shop-provider" class="flex flex-col gap-y-3">
+      {{- shop | login_button: hide_button: hide_shop_login_button }}
+
+      {%- unless hide_shop_login_button -%}
+        <p>
+          {{ 'customer.login_page.alternate_provider_separator' | t }}
+        </p>
+      {%- endunless -%}
+    </section>
+  {%- endif -%}
+
+  {%- form 'customer_login', novalidate: 'novalidate', class: 'w-full flex flex-col gap-y-5' -%}
+    {%- if form.errors -%}
+      <div class="flex flex-col gap-y-3 text-error [&_ul]:list-disc [&_ul]:list-inside">
+        <p tabindex="-1" autofocus>
+          <span class="sr-only">{{ 'accessibility.error' | t }} </span>
+          {%- render 'icon-error', class: 'w-4 inline-block' -%}
+          <span class="inline-block">{{- 'templates.contact.form.error_heading' | t -}}</span>
+        </p>
+
+        {{- form.errors | default_errors -}}
+      </div>
+    {%- endif -%}
+
+    <div class="flex flex-col gap-y-1">
+      <label for="CustomerEmail" class="form__label leading-[1]">
+        {{- 'customer.login_page.email' | t -}}
+      </label>
+
+      <input
+        type="email"
+        name="customer[email]"
+        id="CustomerEmail"
+        class="form__input"
+        autocomplete="email"
+        autocorrect="off"
+        autocapitalize="off"
+        {% if form.errors contains 'form' %}
+          aria-invalid="true"
+        {% endif %}
+        placeholder="{{ 'customer.login_page.email' | t }}"
+      >
+    </div>
+
+    {%- if form.password_needed -%}
+      <div class="flex flex-col gap-y-1">
+        <label for="CustomerPassword" class="form__label leading-[1]">
+          {{- 'customer.login_page.password' | t -}}
+        </label>
+
+        <input
+          type="password"
+          value=""
+          name="customer[password]"
+          id="CustomerPassword"
+          class="form__input"
+          autocomplete="current-password"
+          {% if form.errors contains 'form' %}
+            aria-invalid="true"
+          {% endif %}
+          placeholder="{{ 'customer.login_page.password' | t }}"
+        >
+      </div>
+
+      <a href="#recover" class="underline body-4 font-medium w-max">
+        {{- 'customer.login_page.forgot_password' | t -}}
+      </a>
+    {%- endif -%}
+
+    <button type="submit" class="button-primary medium">
+      {{- 'customer.login_page.sign_in' | t -}}
+    </button>
+
+    <a class="underline body-4 font-medium text-center w-max mx-auto" href="{{ routes.account_register_url }}">
+      {{- 'customer.login_page.create_account' | t -}}
+    </a>
+  {%- endform -%}
+
+  {%- if shop.checkout.guest_login -%}
+    <div class="w-full flex flex-col gap-y-2 pt-5 border-t border-t-gray-400">
+      <h2 class="body-2 text-center">{{ 'customer.login_page.guest_title' | t }}</h2>
+
+      {%- form 'guest_login', class: 'w-full flex flex-col gap-y-2' -%}
+        <button type="submit" class="button-secondary">
+          {{- 'customer.login_page.guest_continue' | t -}}
+        </button>
+      {%- endform -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{%- render 'recover-password' -%}
+
+<script>
+  toggleSection();
+  window.addEventListener('hashchange', toggleSection);
+
+  function toggleSection() {
+    const hash = window.location.hash;
+    const loginSection = document.getElementById('login');
+    const recoverSection = document.getElementById('recover');
+
+    if (hash === '#recover') {
+      loginSection.style.display = 'none';
+      recoverSection.style.display = '';
+    } else {
+      loginSection.style.display = '';
+      recoverSection.style.display = 'none';
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Login Page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_shop_login_button",
+      "label": "Enable Sign in with Shop",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

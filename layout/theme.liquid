@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {%- render 'meta-tags' -%}
+
+    {%- include 'content-for-header' -%}
+    {{ content_for_header }}
+    {%- render 'extend-shopify-header' -%}
+
+    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+
+    {%- style -%}
+      {%- render 'global-style-fonts', styleTag: false -%}
+      {%- render 'global-style-color-schemes', styleTag: false -%}
+    {%- endstyle -%}
+
+    {{ 'main.css' | asset_url | stylesheet_tag }}
+
+    {%- render 'global-listeners' -%}
+    {%- render 'store-schemes' -%}
+  </head>
+
+  <body class="body-3 gradient {% if cart.item_count == 0 %} cart-is-empty {% endif %}">
+    <a class="skip-to-content-link sr-only" href="#MainContent">
+      {{- 'accessibility.skip_to_text' | t -}}
+    </a>
+
+    {%- sections 'header-group' -%}
+
+    <main id="MainContent" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {%- sections 'footer-group' -%}
+    {%- section 'cart-drawer' -%}
+
+    <script>
+      window.variantStrings = {
+        addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+        soldOut: `{{ 'products.product.sold_out' | t }}`,
+        unavailable: `{{ 'products.product.unavailable' | t }}`,
+        unavailable_with_option: `{{ 'products.product.value_unavailable' | t: option_value: '[value]' }}`,
+      };
+
+      window.quickOrderListStrings = {
+        each: `{{- 'sections.quick_order_list.each' | t: money: '[money]' }}`,
+      };
+    </script>
+
+    <script src="{{ 'main.js' | asset_url }}" defer="defer"></script>
+    {%- render 'lazy-scripts' -%}
+  </body>
+</html>

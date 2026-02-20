@@ -1,0 +1,30 @@
+{
+  "sections": {
+    "main-cart": {
+      "type": "main-cart",
+      "blocks": {
+        "subtotal_Ldr6ij": {
+          "type": "subtotal",
+          "settings": {
+          }
+        },
+        "buttons_UpzP8P": {
+          "type": "buttons",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "subtotal_Ldr6ij",
+        "buttons_UpzP8P"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "heading": "Your Cart"
+      }
+    }
+  },
+  "order": [
+    "main-cart"
+  ]
+}

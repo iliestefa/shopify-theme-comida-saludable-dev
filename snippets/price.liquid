@@ -1,0 +1,55 @@
+{%- liquid
+  assign product = product | default: blank
+  assign use_variant = use_variant | default: false, allow_false: true
+  assign show_badges = show_badges | default: true, allow_false: true
+  assign show_compare_at_price = show_compare_at_price | default: true, allow_false: true
+  assign price_class = price_class | default: blank
+
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign money_price = price | money
+
+  if target == product and product.price_varies
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+-%}
+
+<div class="flex flex-row flex-wrap items-center gap-3 body-3 {{ price_class }}">
+  {%- if show_compare_at_price and compare_at_price > price -%}
+    <s class="text-disabled">
+      {{- compare_at_price | money -}}
+    </s>
+  {%- endif -%}
+
+  {%- if product.quantity_price_breaks_configured? -%}
+    {%- liquid
+      assign money_price_min = product.price_min | money
+      assign money_price_max = product.price_max | money
+    -%}
+    <span>
+      {{- 'products.product.volume_pricing.price_range' | t: minimum: money_price_min, maximum: money_price_max -}}
+    </span>
+  {%- else -%}
+    <span>
+      {{- money_price -}}
+    </span>
+  {%- endif -%}
+
+  {%- if show_badges -%}
+    {%- if target.available == false -%}
+      <span class="bg-red-500 rounded-full text-white px-3 py-2 body-4 text-nowrap leading-[1]">
+        {{- 'products.product.sold_out' | t -}}
+      </span>
+    {%- elsif show_compare_at_price and compare_at_price > price -%}
+      <span class="bg-green-500 rounded-full text-white px-3 py-2 body-4 text-nowrap leading-[1]">
+        {{- 'products.product.on_sale' | t -}}
+      </span>
+    {%- endif -%}
+  {%- endif -%}
+</div>

@@ -1,0 +1,34 @@
+<div
+  class="py-5 border-y border-y-gray-300"
+  {{ block.shopify_attributes }}
+  x-data="{ expanded: false }"
+>
+  <button
+    type="button"
+    x-on:click="expanded = !expanded"
+    class="w-full flex flex-row justify-between items-center gap-4"
+  >
+    <h3 class="h5 richtext">
+      {{- block.settings.heading | default: block.settings.page.title | escape -}}
+    </h3>
+
+    <span
+      class="transition-transform px-4"
+      :class="{ 'rotate-180': expanded }"
+    >
+      {%- render 'icon-caret' -%}
+    </span>
+  </button>
+
+  <div
+    class="w-full"
+    style="display: none;"
+    x-show="expanded"
+    x-collapse
+  >
+    <div class="w-full pt-5 richtext body-4">
+      {{- block.settings.content -}}
+      {{- block.settings.page.content -}}
+    </div>
+  </div>
+</div>

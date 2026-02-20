@@ -1,0 +1,27 @@
+<script>
+  window.accessibilityNav = false;
+  window.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key === 'Tab' || e.keyCode === 9) {
+        window.accessibilityNav = true;
+        document.documentElement.classList.add('focus-is-visible');
+      }
+    },
+    { once: true }
+  );
+
+  window.userHasInteracted = Shopify.designMode || false;
+  (function () {
+    const userEvents = ['touchstart', 'mousemove'];
+
+    function userInteractingListener() {
+      userEvents.forEach((event) => document.removeEventListener(event, userInteractingListener));
+      window.userHasInteracted = true;
+      document.dispatchEvent(new CustomEvent('userHasInteracted'));
+      window.localStorage.setItem('userInteractedOnce', true);
+    }
+
+    userEvents.forEach((event) => document.addEventListener(event, userInteractingListener, { once: true }));
+  })();
+</script>

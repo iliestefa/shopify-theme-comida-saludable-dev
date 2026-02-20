@@ -1,0 +1,60 @@
+body {
+  @apply font-body;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  @apply font-[600] normal-case font-headings;
+}
+
+.h1 {
+  @apply xs-down:text-[30px] text-[40px] md:text-[45px] lg:text-[50px] xl:text-[55px] leading-[1.25] -tracking-[1.5px];
+}
+
+.h2 {
+  @apply xs-down:text-[20px] text-[24px] md:text-[30px] lg:text-[35px] xl:text-[40px] leading-[1.25] -tracking-[1px] md:-tracking-[1.5px];
+}
+
+.h3 {
+  @apply xs-down:text-lg text-[22px] lg:text-[34px] leading-[1.25] -tracking-[1px] md:-tracking-[1.5px];
+}
+
+.h4 {
+  @apply xs-down:text-base text-[18px] lg:text-[24px] leading-[1.25];
+}
+
+.h5 {
+  @apply xs-down:text-base text-[16px] lg:text-[20px] leading-[1.25];
+}
+
+.h6 {
+  @apply xs-down:text-sm text-[14px] leading-[1.25];
+}
+
+.body-1 {
+  @apply text-[16px] md:text-[20px] leading-[1.5] tracking-[0.5px];
+}
+
+.body-2 {
+  @apply text-[16px] md:text-[18px] leading-[1.5] tracking-[0.5px];
+}
+
+.body-3 {
+  @apply text-[14px] xs:text-[16px] leading-[1.5] tracking-[.25px];
+}
+
+.body-4 {
+  @apply text-[14px] leading-[1.5];
+}
+
+.body-5 {
+  @apply text-[12px] leading-[1.25];
+}
+
+.body-6 {
+  @apply text-[11px] leading-[1.25];
+}

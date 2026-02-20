@@ -1,0 +1,97 @@
+<section class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="c-container py-2 flex flex-row justify-between items-center">
+    {%- if section.settings.show_social -%}
+      <div class="hidden lg:flex flex-1">
+        {%- render 'social-icons' -%}
+      </div>
+    {%- endif -%}
+
+    <div
+      class="flex flex-auto flex-row justify-center"
+      role="region"
+      aria-label="{{ 'sections.header.announcement' | t }}"
+    >
+      {%- if section.settings.announcement_message != blank -%}
+        <div class="richtext text-center">
+          {{- section.settings.announcement_message -}}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="hidden lg:flex flex-row justify-end gap-4 flex-1">
+      {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+        {%- render 'country-selector', local_position: 'Announcement' -%}
+      {% endif %}
+
+      {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+        {%- render 'language-selector', local_position: 'Announcement' -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "class": "section-announcement",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-4"
+    },
+    {
+      "type": "header",
+      "content": "Social media icons",
+      "info": "To display your social media accounts, link them in your [theme settings](/editor?context=theme&category=social%20media)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "default": true,
+      "label": "Show icons on desktop"
+    },
+    {
+      "type": "header",
+      "content": "Announcement"
+    },
+    {
+      "type": "richtext",
+      "id": "announcement_message",
+      "label": "Announcement message",
+      "default": "<p>Welcome to our <a href=\"#\">Store</a></p>"
+    },
+    {
+      "type": "header",
+      "content": "Country/region selector",
+      "info": "To add a country/region, go to your [market settings.](/admin/settings/markets)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "Enable country/region selector"
+    },
+    {
+      "type": "header",
+      "content": "Language selector",
+      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "Enable language selector"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar"
+    }
+  ]
+}
+{% endschema %}

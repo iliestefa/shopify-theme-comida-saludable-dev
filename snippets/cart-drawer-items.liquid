@@ -1,0 +1,47 @@
+<form
+  action="{{ routes.cart_url }}"
+  id="CartDrawer-Form"
+  class="flex flex-col"
+  method="post"
+>
+  {%- for item in cart.items -%}
+    {%- assign data_line = forloop.index -%}
+    <div class="cart-line-item grid grid-cols-10 gap-3 md:gap-5 py-6 transition-all duration-500 {% unless forloop.last %} border-b border-b-gray-300 {% endunless %}">
+      <div class="col-span-3">
+        {%- if item.image -%}
+          <a href="{{ item.url }}" class="block" tabindex="-1" aria-hidden="true">
+            {%- render 'image-element', image: item.image, fixed_width: 300, class: 'rounded-md' -%}
+          </a>
+        {%- endif -%}
+      </div>
+
+      <div class="col-span-7 flex flex-col gap-y-4">
+        <div class="flex flex-row gap-5">
+          <div class="flex flex-col gap-y-2">
+            {%- if settings.show_cart_vendor -%}
+              <p class="body-4 uppercase">{{ item.product.vendor }}</p>
+            {%- endif -%}
+
+            <a href="{{ item.url }}" class="h5">
+              {{- item.product.title | escape -}}
+            </a>
+
+            {%- render 'line-item-unit-price', item: item -%}
+          </div>
+
+          {%- render 'line-item-final-price', item: item -%}
+        </div>
+
+        {%- render 'line-item-options-and-properties', item: item -%}
+
+        {%- render 'line-item-selling-plan', item: item -%}
+
+        {%- render 'line-item-discounts', item: item -%}
+
+        {%- render 'line-item-qty-actions', item: item, data_line: data_line -%}
+
+        {%- render 'line-item-volume-price-or-quantity-rules-info', item: item -%}
+      </div>
+    </div>
+  {%- endfor -%}
+</form>

@@ -1,0 +1,67 @@
+{%- assign selected_variant = product.selected_or_first_available_variant -%}
+
+<div
+  id="Quantity-Form-{{ section.id }}"
+  class="product-form__input product-form__quantity flex flex-col gap-y-3"
+  {{ block.shopify_attributes }}
+>
+  {%- assign cart_qty = cart | item_count_for_variant: selected_variant.id -%}
+
+  <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
+    <span>{{ 'products.product.quantity.label' | t }}</span>
+    <span class="{% if cart_qty == 0 %} hidden{% endif %}">
+      (
+      {{- 'products.product.quantity.in_cart_html' | t: quantity: cart_qty -}}
+      )
+    </span>
+  </label>
+
+  <div class="flex flex-row items-center gap-3">
+    <quantity-input
+      class="flex flex-row border border-black rounded-full h-12"
+      data-url="{{ product.url }}"
+      data-section="{{ section.id }}"
+    >
+      <button
+        type="button"
+        name="minus"
+        class="quantity__button w-12 grid h-full place-content-center"
+        aria-label="{{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}"
+      >
+        {%- render 'icon-minus', class: 'w-3 pointer-events-none' -%}
+      </button>
+
+      <input
+        class="quantity__input w-16 text-center appearance-none outer-spin-none bg-transparent"
+        type="number"
+        name="quantity"
+        id="Quantity-{{ section.id }}"
+        data-cart-quantity="{{ cart_qty }}"
+        data-min="{{ selected_variant.quantity_rule.min }}"
+        min="{{ selected_variant.quantity_rule.min }}"
+        {% if selected_variant.quantity_rule.max != null %}
+          data-max="{{ selected_variant.quantity_rule.max }}"
+          max="{{ selected_variant.quantity_rule.max }}"
+        {% endif %}
+        step="{{ selected_variant.quantity_rule.increment }}"
+        value="{{ selected_variant.quantity_rule.min }}"
+        form="{{ product_form_id }}"
+      >
+
+      <button
+        type="button"
+        name="plus"
+        class="quantity__button w-12 grid h-full place-content-center"
+        aria-label="{{- 'products.product.quantity.increase' | t: product: product.title | escape -}}"
+      >
+        {%- render 'icon-plus', class: 'w-3 pointer-events-none' -%}
+      </button>
+    </quantity-input>
+
+    {%- render 'product-per-item', selected_variant: selected_variant, product: product -%}
+  </div>
+
+  {%- render 'product-quantity-rules', selected_variant: selected_variant, product: product -%}
+
+  {%- render 'product-volume-pricing', selected_variant: selected_variant, product: product -%}
+</div>

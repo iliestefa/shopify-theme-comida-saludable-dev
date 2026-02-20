@@ -1,0 +1,43 @@
+<facet-filters-form class="w-full">
+  <form
+    class="flex flex-row justify-end items-center gap-x-6"
+    id="FacetSortForm"
+  >
+    <div class="sorting flex flex-row gap-x-4 items-center">
+      <h2 class="body-3">
+        <label class="text-nowrap" for="SortBy">{{ 'products.facets.sort_by_label' | t }}</label>
+      </h2>
+
+      {%- assign sort_by = search.sort_by | default: search.default_sort_by -%}
+      <select
+        name="sort_by"
+        class="form__input bg-transparent"
+        id="SortBy"
+      >
+        {%- for option in search.sort_options -%}
+          <option
+            value="{{ option.value | escape }}"
+            {% if option.value == sort_by %}
+              selected="selected"
+            {% endif %}
+          >
+            {{- option.name | escape -}}
+          </option>
+        {%- endfor -%}
+      </select>
+    </div>
+
+    <span id="ProductCountDesktop" class="md-down:hidden">
+      {%- if search.results_count -%}
+        {{ 'templates.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
+      {%- elsif search.products_count == search.all_products_count -%}
+        {{ 'products.facets.product_count_simple' | t: count: search.products_count }}
+      {%- else -%}
+        {{
+          'products.facets.product_count'
+          | t: product_count: search.products_count, count: search.all_products_count
+        }}
+      {%- endif -%}
+    </span>
+  </form>
+</facet-filters-form>

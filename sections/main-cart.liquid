@@ -1,0 +1,103 @@
+<section
+  class="w-full py-8 lg:py-12 gradient color-{{ section.settings.color_scheme }}"
+  role="region"
+  aria-label="{{ section.settings.heading }}"
+  id="main-cart"
+  data-section-id="{{ section.id }}"
+>
+  <div class="c-container flex flex-col gap-y-8">
+    {%- if cart.empty? -%}
+      {%- render 'cart-drawer-empty' -%}
+    {%- else -%}
+      <h1 class="h2">{{ section.settings.heading }}</h1>
+      {%- render 'main-cart-items' -%}
+
+      <div class="w-full flex flex-col md:flex-row md:justify-between gap-8">
+        {%- if settings.show_cart_note -%}
+          <div class="w-full md:max-w-[500px]">
+            {%- render 'cart-drawer-note', local_position: 'MainCart', open: true -%}
+          </div>
+        {%- endif -%}
+
+        <div class="w-full md:max-w-[370px] md:ml-auto flex flex-col gap-y-5">
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+              {%- when '@app' -%}
+                {%- render block -%}
+              {%- when 'subtotal' -%}
+                <div class="flex flex-col gap-y-2" {{ block.shopify_attributes }}>
+                  {%- render 'cart-discount-list' -%}
+
+                  {%- if settings.show_discount_field -%}
+                    {%- render 'cart-discount-field' -%}
+                  {%- endif -%}
+
+                  <div class="flex flex-row justify-between items-center" role="status">
+                    <div class="h5">{{ 'sections.cart.estimated_total' | t }}</div>
+                    <span class="h4 font-normal text-nowrap">{{ cart.total_price | money }}</span>
+                  </div>
+
+                  {%- render 'cart-tax-note' -%}
+                </div>
+              {%- when 'buttons' -%}
+                <div class="flex flex-col gap-y-3" {{ block.shopify_attributes }}>
+                  <button
+                    type="submit"
+                    class="button-primary w-full"
+                    name="checkout"
+                    form="MainCart-Form"
+                    {% if cart == empty %}
+                      disabled
+                    {% endif %}
+                  >
+                    {{- 'sections.cart.checkout' | t -}}
+                  </button>
+                  {%- if additional_checkout_buttons -%}
+                    <div class="flex flex-col gap-y-3">
+                      {{ content_for_additional_checkout_buttons }}
+                    </div>
+                  {%- endif -%}
+                </div>
+            {%- endcase -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Main cart",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your Cart"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "subtotal",
+      "name": "Subtotal price",
+      "limit": 1
+    },
+    {
+      "type": "buttons",
+      "name": "Checkout button",
+      "limit": 1
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

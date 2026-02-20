@@ -1,0 +1,148 @@
+<section class="my-8 lg:my-16 color-{{ section.settings.color_scheme }} gradient">
+  <product-recommendations
+    class="c-container flex flex-col gap-y-8"
+    data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.products_to_show }}"
+  >
+    {%- if recommendations.performed and recommendations.products_count > 0 -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="h2">
+          {{- section.settings.heading -}}
+        </h2>
+      {%- endif -%}
+
+      {%- assign columns_desktop = 'lg:grid-cols-3' -%}
+      {%- case section.settings.columns_desktop -%}
+        {%- when 2 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-2' -%}
+        {%- when 3 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-3' -%}
+        {%- when 4 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-4' -%}
+        {%- when 5 -%}
+          {%- assign columns_desktop = 'lg:grid-cols-5' -%}
+      {%- endcase -%}
+
+      {%- assign columns_mobile = 'grid-cols-1' -%}
+      {%- case section.settings.columns_mobile -%}
+        {%- when '1' -%}
+          {%- assign columns_mobile = 'grid-cols-1' -%}
+        {%- when '2' -%}
+          {%- assign columns_mobile = 'grid-cols-2' -%}
+      {%- endcase -%}
+
+      <ul
+        class="grid {{ columns_mobile }} md:grid-cols-2 {{ columns_desktop }} gap-x-3 md:gap-x-5 gap-y-5"
+        role="list"
+      >
+        {%- for recommendation in recommendations.products -%}
+          <li class="col-span">
+            {%- render 'card-product',
+              product: recommendation,
+              show_secondary_image: section.settings.show_secondary_image,
+              show_vendor: section.settings.show_vendor
+            -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </product-recommendations>
+</section>
+
+<script>
+  class ProductRecommendations extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      fetch(this.dataset.url)
+        .then((response) => response.text())
+        .then((text) => {
+          const html = document.createElement('div');
+          html.innerHTML = text;
+          const recommendations = html.querySelector('product-recommendations');
+
+          if (recommendations && recommendations.innerHTML.trim().length) {
+            this.innerHTML = recommendations.innerHTML;
+          }
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
+  }
+
+  customElements.define('product-recommendations', ProductRecommendations);
+</script>
+
+{% schema %}
+{
+  "name": "Related Products",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Dynamic recommendations use order and product information to change and improve over time. [Learn more](https://help.shopify.com/themes/development/recommended-products)"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "You may also like",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 4,
+      "label": "Maximum products to show"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "label": "Number of columns on desktop"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "default": "2",
+      "label": "Number of columns on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 column"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": true,
+      "label": "Show second image on hover"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": true,
+      "label": "Show vendor"
+    }
+  ]
+}
+{% endschema %}

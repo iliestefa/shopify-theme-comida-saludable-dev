@@ -1,0 +1,45 @@
+{% comment %}
+  Accepts:
+  - media: {Object} Product Media object
+  - position: {String} Position of the media. Used for accessible label.
+{% endcomment %}
+
+{%- assign priority = false -%}
+{%- if position == 1 -%}
+  {%- assign priority = true -%}
+{%- endif -%}
+
+<li
+  class="swiper-slide relative"
+  data-media-id="{{ section.id }}-{{ media.id }}"
+  data-position="{{ position }}"
+>
+  <div class="w-full pb-[100%] rounded-[10px] relative overflow-hidden">
+    {%- if media.media_type == 'image' -%}
+      {%- render 'image-element',
+        image: media,
+        max_width: 800,
+        preload: priority,
+        class: 'absolute inset-0 w-full h-full object-cover object-center'
+      -%}
+
+    {%- elsif media.media_type == 'video' -%}
+      {%- assign video_class = 'absolute inset-0 w-full h-full object-cover object-center' -%}
+      {{
+        media
+        | media_tag: image_size: '800', autoplay: true, loop: false, controls: true, preload: 'none', class: video_class
+      }}
+
+    {%- elsif media.media_type == 'external_video' -%}
+      {%- assign external_video_class = 'absolute inset-0 w-full h-full object-cover object-center' -%}
+      {{
+        media
+        | external_video_url: autoplay: false, loop: false, playlist: media.external_id
+        | external_video_tag: class: external_video_class, loading: 'lazy'
+      }}
+
+    {%- elsif media.media_type == 'model' -%}
+      {{ media | media_tag: image_size: '2048x', toggleable: true }}
+    {%- endif -%}
+  </div>
+</li>

@@ -1,0 +1,152 @@
+<div x-data="predictiveSearch">
+  <button
+    type="button"
+    class="block group"
+    aria-haspopup="dialog"
+    aria-label="{{ 'general.search.search' | t }}"
+    :aria-expanded="searchIsOpen"
+    x-on:click="toggleSearch"
+  >
+    {%- render 'icon-search', class: 'h-8 transition-transform group-hover:scale-105' -%}
+  </button>
+
+  <div
+    class="absolute w-full h-full left-0 top-0 z-10 flex items-center color-{{ section.settings.color_scheme }} gradient"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'general.search.search' | t }}"
+    style="display: none;"
+    x-show="searchIsOpen"
+    x-trap="searchIsOpen"
+    @click.away="closeSearch()"
+    @keydown.escape.window="closeSearch()"
+  >
+    <div class="absolute top-full left-0 right-0 h-[100vh] bg-black bg-opacity-30" @click="closeSearch()"></div>
+
+    <div class="c-container flex flex-row justify-center gap-x-6">
+      <form
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+        class="w-full max-w-[700px] md:relative"
+        @click.away="openResults = false"
+        style="display: none;"
+        x-show="searchIsOpen"
+        x-transition
+      >
+        <div class="flex flex-row justify-between rounded-full pl-6 py-2 border border-gray-200 border-opacity-80">
+          <div class="flex flex-col justify-center gap-y-1 w-full">
+            <label class="body-6" for="Search-In-Modal">{{ 'general.search.search' | t }}</label>
+
+            <input
+              class="w-full bg-transparent appearance-none"
+              id="Search-In-Modal"
+              type="search"
+              name="q"
+              value="{{ search.terms | escape }}"
+              role="combobox"
+              aria-haspopup="listbox"
+              aria-autocomplete="list"
+              autocorrect="off"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              x-model="query"
+              placeholder="{{ 'general.search.search' | t }}"
+              x-on:focus="openResults = true"
+              :aria-expanded="openResults && query.length > 0"
+              x-on:input.debounce="getPredictiveSearchResults"
+            >
+          </div>
+
+          <button
+            class="px-4 border-l border-gray-200 border-opacity-20"
+            aria-label="{{ 'general.search.search' | t }}"
+          >
+            {%- render 'icon-search', class: 'h-6' -%}
+          </button>
+        </div>
+
+        <div
+          class="w-full absolute left-0 top-full shadow-md shadow-gray-200/20 rounded-b-[20px] overflow-hidden color-{{ section.settings.color_scheme }} gradient"
+          x-show="openResults && query.length > 0"
+        >
+          <div
+            x-show="isLoading"
+            class="flex flex-row justify-center py-4"
+          >
+            {%- render 'loading-spinner', class: 'w-8' -%}
+          </div>
+
+          <div
+            x-show="!isLoading"
+            x-ref="searchQueryResults"
+            class="flex flex-col gap-y-4"
+          ></div>
+        </div>
+      </form>
+
+      <button
+        type="button"
+        class="py-4"
+        aria-label="{{ 'accessibility.close' | t }}"
+        @click="closeSearch()"
+      >
+        {%- render 'icon-close', class: 'w-4' -%}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener(
+    'alpine:init',
+    () => {
+      Alpine.data('predictiveSearch', () => ({
+        searchIsOpen: false,
+        isLoading: false,
+        query: '',
+        openResults: false,
+        toggleSearch() {
+          this.searchIsOpen = !this.searchIsOpen;
+        },
+        closeSearch() {
+          if (!this.searchIsOpen) return;
+          this.searchIsOpen = false;
+        },
+        getPredictiveSearchResults() {
+          if (this.query.length == 0) return;
+
+          this.isLoading = true;
+          fetch(`${Shopify.routes.predictive_search_url}?q=${this.query}&section_id=predictive-search`)
+            .then((response) => {
+              if (!response.ok) throw new Error(response.status);
+              return response.text();
+            })
+            .then((text) => {
+              const resultsMarkup = new DOMParser()
+                .parseFromString(text, 'text/html')
+                .querySelector('#shopify-section-predictive-search').innerHTML;
+
+              this.$refs.searchQueryResults.innerHTML = resultsMarkup;
+            })
+            .catch((error) => {
+              // Code 20 means the call was aborted
+              if (error?.code === 20) return;
+              throw error;
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+        },
+        init() {
+          this.getPredictiveSearchResults();
+          this.$watch('searchIsOpen', (value) => {
+            document.body.classList.toggle('overflow-hidden', this.searchIsOpen);
+          });
+        },
+      }));
+    },
+    { once: true }
+  );
+</script>

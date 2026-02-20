@@ -1,0 +1,72 @@
+{%- liquid
+  assign lazy = lazy | default: false, allow_false: true
+  assign autoplay = autoplay | default: true, allow_false: true
+  assign loop = loop | default: true, allow_false: true
+  assign muted = muted | default: true, allow_false: true
+  assign playsinline = playsinline | default: true, allow_false: true
+  assign controls = controls | default: false, allow_false: true
+  assign attributes = attributes | default: blank
+  assign class = class | default: ''
+  assign placeholder = placeholder | default: video.preview_image
+  assign placeholder_width = placeholder_width | default: 1280
+  assign preload_placeholder_image = preload_placeholder_image | default: false, allow_false: true
+-%}
+
+<video
+  class="{{ class }}"
+  {% if autoplay %}
+    autoplay
+  {% endif %}
+  {% if loop %}
+    loop
+  {% endif %}
+  {% if muted %}
+    muted
+  {% endif %}
+  {% if playsinline %}
+    playsinline
+  {% endif %}
+  {% if controls %}
+    controls
+  {% endif %}
+  poster="{{ placeholder | image_url: width: placeholder_width }}"
+  {% if lazy %}
+    x-ref="video"
+    x-data="
+      {
+        was_intercepted: false,
+        init() {
+          window.userHasInteracted
+            ? this.initObserver()
+            : document.addEventListener('userHasInteracted', () => this.initObserver(), { once: true });
+        },
+        initObserver() {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                this.was_intercepted = true;
+                observer.disconnect();
+              }
+            });
+          });
+          observer.observe(this.$refs.video);
+        }
+      }
+    "
+  {% endif %}
+  {% if attributes != blank %}
+    {{ attributes }}
+  {% endif %}
+>
+  {%- for source in video.sources -%}
+    {%- if lazy -%}
+      <template x-if="was_intercepted">
+    {%- endif -%}
+    <source src="{{ source.url }}" type="video/{{ source.format }}">
+    {%- if lazy -%}
+      </template>
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- render 'image-element', image: placeholder, fixed_width: placeholder_width, preload: preload_placeholder_image -%}
+</video>

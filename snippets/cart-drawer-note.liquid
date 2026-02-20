@@ -1,0 +1,60 @@
+{%- assign local_position = local_position | default: blank -%}
+{%- assign open = open | default: false, allow_false: true -%}
+
+<div
+  x-data="
+    {
+      open: {{ open | json }},
+      note: '{{ cart.note }}',
+      toggle() {
+        this.open = !this.open;
+      },
+      async onUpdatedNote() {
+        await fetch(window.Shopify.routes.root + 'cart/update.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            note: this.note,
+          }),
+        });
+      }
+    }
+  "
+>
+  <button
+    type="button"
+    class="w-full flex flex-row justify-between items-center gap-4 cursor-pointer"
+    x-on:click="toggle()"
+    aria-label="{{ 'sections.cart.note' | t }}"
+  >
+    <div class="body-3">{{ 'sections.cart.note' | t }}</div>
+    <span
+      class="transition-transform {% if open %} rotate-180 {% endif %}"
+      :class="{ 'rotate-180': open }"
+    >
+      {%- render 'icon-caret', class: 'w-4' -%}
+    </span>
+  </button>
+
+  <div
+    class="w-full px-0.5"
+    x-show="open"
+    x-collapse
+    {% unless open %}
+      style="display: none;"
+    {% endunless %}
+  >
+    <label class="sr-only" for="{{ local_position }}-Note">{{ 'sections.cart.note' | t }}</label>
+    <textarea
+      class="form__input min-h-24 mt-2"
+      name="note"
+      id="{{ local_position }}-Note"
+      placeholder="{{ 'sections.cart.note' | t }}"
+      x-on:input.debounce="onUpdatedNote"
+      x-model="note"
+    >{{ cart.note }}</textarea>
+  </div>
+</div>

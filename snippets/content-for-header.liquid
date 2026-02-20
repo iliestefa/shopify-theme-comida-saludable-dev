@@ -1,0 +1,18 @@
+{%- capture code_injection -%}
+  let lazyScriptsKeys = [];
+
+  let lazyOnceScriptsKeys = [];
+
+  if (window.localStorage.getItem('userInteractedOnce') == null) {
+    lazyScriptsKeys.push(...lazyOnceScriptsKeys);
+  }
+
+  window.headerLazyScripts = urls.filter(url => lazyScriptsKeys.some(script => url.includes(script)));
+  urls = urls.filter(url => !lazyScriptsKeys.some(script => url.includes(script)));
+{%- endcapture -%}
+
+{%- liquid
+  assign async_func_ref = 'for (var i = 0; i < urls.length; i++)'
+  assign code_injection = code_injection | append: async_func_ref
+  assign content_for_header = content_for_header | replace: async_func_ref, code_injection
+-%}

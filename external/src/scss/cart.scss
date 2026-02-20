@@ -1,0 +1,36 @@
+.is-invisible {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.cart-drawer-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background-color: rgba(0, 0, 0, 0.4);
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+body.cart-is-empty {
+  .hide-if-cart-empty {
+    display: none;
+  }
+
+  #cart-drawer-footer {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

@@ -1,0 +1,139 @@
+<div
+  class="flex items-center lg:hidden"
+  x-data="
+    {
+      drawerIsOpen: false,
+      toggleDrawer() {
+        this.drawerIsOpen = !this.drawerIsOpen;
+      },
+      closeDrawer() {
+        if (!this.drawerIsOpen) return;
+        this.drawerIsOpen = false;
+      },
+      init() {
+        this.$watch('drawerIsOpen', () => {
+          if (!this.drawerIsOpen) this.$dispatch('nav-drawer-closed');
+          document.documentElement.style.overflow = this.drawerIsOpen ? 'hidden' : ''
+        });
+      }
+    }
+  "
+  x-on:click.outside="closeDrawer()"
+>
+  <button
+    type="button"
+    aria-label="{{ 'sections.header.menu' | t }}"
+    x-on:click="toggleDrawer()"
+    :aria-expanded="drawerIsOpen"
+  >
+    <span x-show="!drawerIsOpen">
+      {%- render 'icon-hamburger', class: 'w-6' -%}
+    </span>
+
+    <span x-show="drawerIsOpen" style="display: none;">
+      {%- render 'icon-close', class: 'w-6' -%}
+    </span>
+  </button>
+
+  <div
+    class="fixed w-full h-full max-w-[420px] top-0 left-0 z-10 gradient color-{{ section.settings.menu_color_scheme }}"
+    x-transition:enter="transition-all ease-out duration-300"
+    x-transition:enter-start="!-left-full"
+    x-transition:enter-end="left-0"
+    x-transition:leave="transition-all ease-in duration-300"
+    x-transition:leave-start="left-0"
+    x-transition:leave-end="!-left-full"
+    x-trap="drawerIsOpen"
+    x-show="drawerIsOpen"
+    style="display: none;"
+  >
+    <div class="relative h-full grid grid-rows-[auto_1fr_auto] overflow-x-hidden">
+      <div class="h-[80px] flex items-center border-b border-b-gray-200 border-opacity-20">
+        <button
+          type="button"
+          aria-label="{{ 'sections.header.menu' | t }}"
+          x-on:click="closeDrawer()"
+          :aria-expanded="drawerIsOpen"
+          class="px-8 py-4"
+        >
+          <span x-show="!drawerIsOpen">
+            {%- render 'icon-hamburger', class: 'w-6' -%}
+          </span>
+
+          <span x-show="drawerIsOpen" style="display: none;">
+            {%- render 'icon-close', class: 'w-6' -%}
+          </span>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto pt-5">
+        <nav class="w-full">
+          <ul class="flex flex-col" role="list">
+            {%- for link in section.settings.menu.links -%}
+              {%- assign main_link_index = forloop.index -%}
+              {%- assign mega_menu_block = blank -%}
+              {%- assign mega_menu_blocks = section.blocks | where: 'type', 'mega-menu' -%}
+              {%- for block in mega_menu_blocks -%}
+                {%- if block.settings.index == main_link_index -%}
+                  {%- assign mega_menu_block = block -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+
+              <li>
+                {%- if link.links != blank or mega_menu_block != blank -%}
+                  {%- render 'header-drawer-submenu-1', link: link, mega_menu_block: mega_menu_block -%}
+                {%- else -%}
+                  <a
+                    href="{{ link.url }}"
+                    class="flex px-8 py-4 body-2"
+                    {% if link.current %}
+                      aria-current="page"
+                    {% endif %}
+                  >
+                    {{- link.title | escape -}}
+                  </a>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      </div>
+
+      <div
+        class="w-full flex flex-col gap-y-5 p-5"
+        style="background-color: rgba(var(--color-foreground), .03);"
+      >
+        {%- if shop.customer_accounts_enabled -%}
+          <a
+            href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+            class="flex flex-row items-center gap-3 w-max"
+          >
+            {%- render 'icon-account', class: 'w-4' -%}
+            <span>
+              {%- if customer -%}
+                {{- 'customer.account_fallback' | t }}
+              {%- else -%}
+                {{- 'customer.log_in' | t }}
+              {%- endif -%}
+            </span>
+          </a>
+        {%- endif -%}
+
+        {%- if localization.available_countries or localization.available_languages -%}
+          <div class="flex flex-row flex-wrap gap-4">
+            {%- if localization.available_countries and localization.available_countries.size > 1 -%}
+              {%- render 'country-selector', local_position: 'HeaderDrawer' -%}
+            {% endif %}
+
+            {%- if localization.available_languages and localization.available_languages.size > 1 -%}
+              {%- render 'language-selector', local_position: 'HeaderDrawer' -%}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- render 'social-icons' -%}
+      </div>
+    </div>
+  </div>
+</div>

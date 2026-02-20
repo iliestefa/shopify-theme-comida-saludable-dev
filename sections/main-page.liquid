@@ -1,0 +1,22 @@
+<section
+  class="w-full py-8 lg:py-12"
+  role="main"
+  aria-label="{{ page.title }}"
+>
+  <div class="c-container flex flex-col gap-y-8">
+    <h1 class="h2">
+      {{- page.title | escape -}}
+    </h1>
+
+    <div class="richtext">
+      {{- page.content -}}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Page",
+  "settings": []
+}
+{% endschema %}

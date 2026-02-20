@@ -1,0 +1,103 @@
+<section class="w-full py-8 lg:py-16 border-t border-t-gray-400 border-opacity-20 color-{{ section.settings.color_scheme }} gradient">
+  <div class="c-container flex flex-col gap-y-8">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when '@app' -%}
+          {% render block %}
+        {%- when 'heading' -%}
+          {%- if block.settings.heading != blank -%}
+            <h2
+              class="h2 text-center"
+              {{ block.shopify_attributes }}
+            >
+              {{- block.settings.heading -}}
+            </h2>
+          {%- endif -%}
+
+        {%- when 'paragraph' -%}
+          {%- if block.settings.text != blank -%}
+            <div
+              class="richtext text-center"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </div>
+          {%- endif -%}
+        {%- when 'email_form' -%}
+          <div class="w-full max-w-[500px] mx-auto" {{ block.shopify_attributes }}>
+            {%- render 'newsletter-form', local_position: 'Section' -%}
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Subscribe to our emails",
+          "label": "Heading"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "name": "Subheading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Be the first to know about new collections and exclusive offers.</p>",
+          "label": "Description"
+        }
+      ]
+    },
+    {
+      "type": "email_form",
+      "name": "Email form",
+      "limit": 1
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "email_form"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

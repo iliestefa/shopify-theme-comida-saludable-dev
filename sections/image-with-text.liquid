@@ -1,0 +1,428 @@
+{%- assign container_width = section.settings.container_width -%}
+
+{%- case section.settings.container_spacer_type -%}
+  {%- when 'margin' -%}
+    {%- assign spacer_class = 'my-8 lg:my-12' -%}
+  {%- when 'padding' -%}
+    {%- assign spacer_class = 'py-8 lg:py-12' -%}
+  {%- else -%}
+    {%- assign spacer_class = '' -%}
+{%- endcase -%}
+
+<section
+  class="w-full color-{{ section.settings.color_scheme }} gradient"
+  role="region"
+  aria-labelledby="heading-{{ section.id }}"
+  {% if section.settings.section_id != blank %}
+    id="{{ section.settings.section_id | handleize }}"
+  {% endif %}
+>
+  <div class="c-container {% if container_width == 'wide' %} wide {% endif %} grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-6 lg:gap-x-12 {{ spacer_class }}">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'image' -%}
+        {%- assign desktop_image = block.settings.desktop_image -%}
+        {%- assign mobile_image = block.settings.mobile_image | default: desktop_image -%}
+        {%- assign desktop_video = block.settings.desktop_video -%}
+        {%- assign mobile_video = block.settings.mobile_video | default: desktop_video -%}
+
+        <div
+          class="flex flex-col col-span-1 md-down:order-[1]"
+          {% if block.settings.justify_content != 'full' %}
+            style="justify-content: {{ block.settings.justify_content }};"
+          {% endif %}
+        >
+          <div
+            class="w-full {% if block.settings.rounded_corners %} rounded-[20px] overflow-hidden translate-x-0 {% endif %} {% if block.settings.justify_content == 'full' %} h-full {%- endif -%}"
+            {% if block.settings.bg_color != blank %}
+              style="background: {{ block.settings.bg_color }};"
+            {% endif %}
+          >
+            {%- assign preload = false -%}
+            {%- if section.index == 1 -%}
+              {%- assign preload = true -%}
+            {%- endif -%}
+
+            {%- if block.settings.use_video_or_image == 'image' -%}
+              {%- if mobile_image != blank -%}
+                {%- render 'image-element',
+                  image: desktop_image,
+                  class: 'w-full h-full object-center object-cover sm2-down:hidden',
+                  preload: preload,
+                  max_width: 800
+                -%}
+
+                {%- render 'image-element',
+                  image: mobile_image,
+                  class: 'w-full sm2:hidden',
+                  preload: preload,
+                  max_width: 800
+                -%}
+              {%- else -%}
+                {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            {%- else -%}
+              {%- if mobile_video != blank -%}
+                {%- render 'video-element',
+                  video: desktop_video,
+                  class: 'w-full h-full object-center object-cover mix-blend-multiply hidden md:block',
+                  autoplay: true,
+                  muted: true,
+                  lazy: true,
+                  preload_placeholder_image: preload
+                -%}
+
+                {%- render 'video-element',
+                  video: mobile_video,
+                  class: 'w-full mix-blend-multiply md:hidden',
+                  autoplay: true,
+                  muted: true,
+                  lazy: true,
+                  preload_placeholder_image: preload
+                -%}
+              {%- else -%}
+                {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if block.type == 'content' -%}
+        <div
+          class="col-span-1 flex flex-col gap-y-12 md-down:order-[2] {% if block.settings.rounded_corners %} rounded-[20px] overflow-hidden p-4 lg:p-8 xl:px-12 {% else %} lg:px-8 {% endif %} "
+          style="
+            {% if block.settings.justify_content %} justify-content: {{ block.settings.justify_content }}; {% endif %}
+            {% if block.settings.bg_color != blank %} background: {{ block.settings.bg_color }}; {% endif %}
+            color: {{ block.settings.text_color }};
+          "
+        >
+          <div class="flex flex-col gap-y-5">
+            <div class="flex flex-col gap-y-1">
+              {%- if block.settings.caption != blank -%}
+                <div class="h6">
+                  {{- block.settings.caption -}}
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.heading_text != blank -%}
+                <h2 class="h2" id="heading-{{ section.id }}">
+                  {{- block.settings.heading_text -}}
+                </h2>
+              {%- endif -%}
+            </div>
+
+            {%- if block.settings.description != blank -%}
+              <div class="body-3 richtext">
+                {{- block.settings.description -}}
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- assign first_button = block.settings.button_text_1 -%}
+          {%- assign second_button = block.settings.button_text_2 -%}
+          {%- if first_button != blank or second_button != blank -%}
+            <div class="flex flex-col sm2:flex-row flex-wrap gap-4">
+              {%- if first_button != blank -%}
+                <a class="button-primary min-w-[150px]" href="{{ block.settings.button_link_1 }}">
+                  {{- first_button -}}
+                </a>
+              {%- endif -%}
+
+              {%- if second_button != blank -%}
+                <a class="button-primary min-w-[150px]" href="{{ block.settings.button_link_2 }}">
+                  {{- second_button -}}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image and text",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Container"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "Container width",
+      "options": [
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "container_spacer_type",
+      "label": "Container spacer type",
+      "options": [
+        {
+          "value": "margin",
+          "label": "Margin"
+        },
+        {
+          "value": "padding",
+          "label": "Padding"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "padding"
+    },
+    {
+      "type": "header",
+      "content": "SECTION"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID",
+      "info": "To refer to this section you must place #your-section-id in the internal reference links",
+      "placeholder": "your-section-id"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Image / Video",
+      "type": "image",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "justify_content",
+          "options": [
+            {
+              "value": "start",
+              "label": "Start"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "End"
+            },
+            {
+              "value": "full",
+              "label": "Full"
+            }
+          ],
+          "default": "center",
+          "label": "Justify content"
+        },
+        {
+          "type": "checkbox",
+          "id": "rounded_corners",
+          "label": "Rounded corners?",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background color"
+        },
+        {
+          "type": "select",
+          "id": "use_video_or_image",
+          "label": "Use video or image?",
+          "options": [
+            {
+              "value": "image",
+              "label": "image"
+            },
+            {
+              "value": "video",
+              "label": "video"
+            }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "header",
+          "content": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop image",
+          "info": "recommended size: 1300x900px"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image",
+          "info": "recommended size: 900x700px"
+        },
+        {
+          "type": "header",
+          "content": "Video",
+          "info": "Upload a video to replace the image."
+        },
+        {
+          "type": "video",
+          "id": "desktop_video",
+          "label": "Desktop Video",
+          "info": "recommended size: 1300x900px"
+        },
+        {
+          "type": "video",
+          "id": "mobile_video",
+          "label": "Mobile Video",
+          "info": "recommended size: 900x700px"
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "type": "content",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "justify_content",
+          "options": [
+            {
+              "value": "start",
+              "label": "Start"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "End"
+            }
+          ],
+          "default": "start",
+          "label": "Justify content"
+        },
+        {
+          "type": "checkbox",
+          "id": "rounded_corners",
+          "label": "Rounded corners?",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background color"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#000000"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "caption",
+          "label": "Caption",
+          "default": "Caption text"
+        },
+        {
+          "type": "richtext",
+          "id": "heading_text",
+          "label": "Heading",
+          "default": "<p>Image and Text</p>"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio amet a illo eaque eligendi dignissimos alias optio quas, ipsam sint facilis eum vitae provident consequatur repellat cupiditate sed quisquam consequuntur tempore vel. In explicabo omnis ducimus, error a natus nemo!</p>"
+        },
+        {
+          "type": "header",
+          "content": "Buttons"
+        },
+        {
+          "type": "text",
+          "id": "button_text_1",
+          "label": "First Button text",
+          "default": "Shop Women",
+          "info": "Leave blank to hide the button"
+        },
+        {
+          "type": "url",
+          "id": "button_link_1",
+          "label": "First Button link"
+        },
+        {
+          "type": "text",
+          "id": "button_text_2",
+          "label": "Second Button text",
+          "default": "Shop Men",
+          "info": "Leave blank to hide the button"
+        },
+        {
+          "type": "url",
+          "id": "button_link_2",
+          "label": "Second Button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image and text 1",
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "rounded_corners": true
+          }
+        },
+        {
+          "type": "content"
+        }
+      ]
+    },
+    {
+      "name": "Image and text 2",
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "rounded_corners": true
+          }
+        },
+        {
+          "type": "content",
+          "settings": {
+            "rounded_corners": true,
+            "bg_color": "#E1E5E9",
+            "text_color": "#000000"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

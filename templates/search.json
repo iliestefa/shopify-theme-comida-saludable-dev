@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-search",
+      "settings": {
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "show_secondary_image": true,
+        "show_vendor": true,
+        "enable_filtering": true,
+        "enable_sorting": true,
+        "article_show_date": true,
+        "article_show_author": true
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

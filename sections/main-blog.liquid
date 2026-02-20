@@ -1,0 +1,53 @@
+<section
+  class="w-full py-8 lg:py-12"
+  role="main"
+  aria-label="Blog - {{ blog.title }}"
+>
+  {%- paginate blog.articles by 6 -%}
+    <div class="c-container flex flex-col gap-y-8">
+      <h1 class="h2">
+        {{- blog.title | escape -}}
+      </h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {%- for article in blog.articles -%}
+          {%- assign priority = false -%}
+          {%- if forloop.index <= 3 -%}
+            {%- assign priority = true -%}
+          {%- endif -%}
+
+          {%- render 'article-card',
+            article: article,
+            show_author: section.settings.show_author,
+            show_date: section.settings.show_date,
+            priority: priority
+          -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        {%- render 'pagination', paginate: paginate -%}
+      {%- endif -%}
+    </div>
+  {%- endpaginate -%}
+</section>
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "default": true,
+      "label": "Show date"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "default": true,
+      "label": "Show author"
+    }
+  ]
+}
+{% endschema %}

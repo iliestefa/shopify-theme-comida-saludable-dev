@@ -1,0 +1,207 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "current": {
+    "logo": "shopify://shop_images/Logo.png",
+    "logo_width": 140,
+    "type_header_font": "poppins_n4",
+    "type_body_font": "questrial_n4",
+    "social_facebook_link": "#",
+    "social_instagram_link": "#",
+    "social_youtube_link": "#",
+    "social_tiktok_link": "#",
+    "social_twitter_link": "#",
+    "social_snapchat_link": "#",
+    "social_pinterest_link": "#",
+    "social_tumblr_link": "#",
+    "social_vimeo_link": "#",
+    "predictive_search_show_vendor": true,
+    "predictive_search_show_price": true,
+    "show_cart_vendor": true,
+    "show_cart_note": true,
+    "show_discount_field": true,
+    "cart_stack_discount_codes": true,
+    "cart_drawer_collection": "automated-collection",
+    "cart_color_scheme": "scheme-1",
+    "sections": {
+      "main-password-header": {
+        "type": "main-password-header",
+        "settings": {
+          "color_scheme": "scheme-3"
+        }
+      },
+      "cart-drawer": {
+        "type": "cart-drawer",
+        "settings": {
+          "heading": "My Cart"
+        }
+      }
+    },
+    "content_for_index": [],
+    "blocks": {
+      "17635902270821987737": {
+        "type": "shopify://apps/social-proof-app/blocks/app-embed/0198d048-48ce-7c9c-a1a2-19e9bfe47636",
+        "disabled": false,
+        "settings": {
+          "low_stock_threshold": 10,
+          "low_stock_text": "Low Stock",
+          "almost_sold_out_threshold": 5,
+          "almost_sold_out_text": "Almost Sold Out",
+          "only_remaining_threshold": 3,
+          "only_remaining_text": "Only Remaining"
+        }
+      }
+    },
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#eff0f5",
+          "background_gradient": "",
+          "text": "#0e1b4d",
+          "button": "#4770db",
+          "button_label": "#eff0f5",
+          "secondary_button_label": "#0e1b4d",
+          "shadow": "#0e1b4d"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#ffffff",
+          "background_gradient": "",
+          "text": "#0e1b4d",
+          "button": "#0e1b4d",
+          "button_label": "#ffffff",
+          "secondary_button_label": "#0e1b4d",
+          "shadow": "#0e1b4d"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#0e1b4d",
+          "background_gradient": "",
+          "text": "#ffffff",
+          "button": "#ffffff",
+          "button_label": "#0e1b4d",
+          "secondary_button_label": "#ffffff",
+          "shadow": "#0e1b4d"
+        }
+      },
+      "scheme-4": {
+        "settings": {
+          "background": "#4770db",
+          "background_gradient": "",
+          "text": "#ffffff",
+          "button": "#ffffff",
+          "button_label": "#4770db",
+          "secondary_button_label": "#ffffff",
+          "shadow": "#0e1b4d"
+        }
+      },
+      "scheme-5": {
+        "settings": {
+          "background": "#e32402",
+          "background_gradient": "",
+          "text": "#ffffff",
+          "button": "#ffffff",
+          "button_label": "#e32402",
+          "secondary_button_label": "#ffffff",
+          "shadow": "#0e1b4d"
+        }
+      }
+    }
+  },
+  "presets": {
+    "Default": {
+      "logo_width": 140,
+      "color_schemes": {
+        "scheme-1": {
+          "settings": {
+            "background": "#eff0f5",
+            "background_gradient": "",
+            "text": "#0e1b4d",
+            "button": "#4770db",
+            "button_label": "#eff0f5",
+            "secondary_button_label": "#0e1b4d",
+            "shadow": "#0e1b4d"
+          }
+        },
+        "scheme-2": {
+          "settings": {
+            "background": "#FFFFFF",
+            "background_gradient": "",
+            "text": "#0e1b4d",
+            "button": "#0e1b4d",
+            "button_label": "#FFFFFF",
+            "secondary_button_label": "#0e1b4d",
+            "shadow": "#0e1b4d"
+          }
+        },
+        "scheme-3": {
+          "settings": {
+            "background": "#0e1b4d",
+            "background_gradient": "",
+            "text": "#FFFFFF",
+            "button": "#FFFFFF",
+            "button_label": "#0e1b4d",
+            "secondary_button_label": "#FFFFFF",
+            "shadow": "#0e1b4d"
+          }
+        },
+        "scheme-4": {
+          "settings": {
+            "background": "#4770db",
+            "background_gradient": "",
+            "text": "#FFFFFF",
+            "button": "#FFFFFF",
+            "button_label": "#4770db",
+            "secondary_button_label": "#FFFFFF",
+            "shadow": "#0e1b4d"
+          }
+        },
+        "scheme-5": {
+          "settings": {
+            "background": "#E32402",
+            "background_gradient": "",
+            "text": "#FFFFFF",
+            "button": "#FFFFFF",
+            "button_label": "#E32402",
+            "secondary_button_label": "#FFFFFF",
+            "shadow": "#0e1b4d"
+          }
+        }
+      },
+      "type_header_font": "archivo_n7",
+      "type_body_font": "questrial_n4",
+      "social_twitter_link": "",
+      "social_facebook_link": "",
+      "social_pinterest_link": "",
+      "social_snapchat_link": "",
+      "social_instagram_link": "",
+      "social_tiktok_link": "",
+      "social_tumblr_link": "",
+      "social_youtube_link": "",
+      "social_vimeo_link": "",
+      "predictive_search_show_vendor": false,
+      "predictive_search_show_price": false,
+      "show_cart_vendor": true,
+      "show_cart_note": true,
+      "cart_drawer_collection": "",
+      "cart_color_scheme": "scheme-1",
+      "sections": {
+        "main-password-header": {
+          "type": "main-password-header",
+          "settings": {
+            "color_scheme": "scheme-3"
+          }
+        }
+      }
+    }
+  }
+}

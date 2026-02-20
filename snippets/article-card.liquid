@@ -1,0 +1,59 @@
+{%- assign priority = priority | default: false, allow_false: true -%}
+{%- assign show_date = show_date | default: false, allow_false: true -%}
+{%- assign show_author = show_author | default: false, allow_false: true -%}
+
+<div class="border border-gray-300 rounded-[10px] overflow-hidden">
+  <a
+    href="{{ article.url }}"
+    class="block w-full pb-[100%] relative shrink-0 overflow-hidden bg-gray-200/50"
+    tabindex="-1"
+  >
+    {%- if article.image -%}
+      {%-
+        render 'image-element',
+        image: article image,
+        max_width: 1200,
+        class: 'absolute w-full h-full inset-0 object-cover object-center'
+        priority: priority
+      -%}
+    {%- endif -%}
+
+    <div class="absolute w-full top-4 px-4 flex flex-row gap-3">
+      <span class="px-3 py-1.5 body-4 bg-green-600 text-white rounded-full leading-[1]">
+        {{- 'blogs.article.blog' | t -}}
+      </span>
+    </div>
+  </a>
+
+  <div class="p-4 flex flex-col gap-y-3">
+    <h3 class="h5">
+      <a href="{{ article.url }}" class="line-clamp-2">
+        {{- article.title -}}
+      </a>
+    </h3>
+
+    {%- if show_date -%}
+      <div class="body-5">{{ article.published_at | time_tag: format: 'date' }}</div>
+    {%- endif -%}
+
+    {%- if show_author -%}
+      <span class="body-5 font-semibold">{{ article.author }}</span>
+    {%- endif -%}
+
+    {%- if article.excerpt.size > 0 or article.content.size > 0 -%}
+      <p class="body-4 line-clamp-3">
+        {%- if article.excerpt.size > 0 -%}
+          {{- article.excerpt | strip_html | truncatewords: 30 -}}
+        {%- else -%}
+          {{- article.content | strip_html | truncatewords: 30 -}}
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+
+    {%- if article.comments_count > 0 -%}
+      <div class="body-4 font-bold">
+        {{- 'blogs.article.comments' | t: count: article.comments_count -}}
+      </div>
+    {%- endif -%}
+  </div>
+</div>

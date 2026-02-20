@@ -1,0 +1,11 @@
+<p
+  class="body-4 {% if block.settings.text_style == 'uppercase' %} uppercase{% endif %}"
+  id="Sku-{{ section.id }}"
+  role="status"
+  {{ block.shopify_attributes }}
+>
+  {%- if product.selected_or_first_available_variant.sku.size > 0 -%}
+    <span class="font-semibold">{{ 'products.product.sku' | t }}: </span>
+    <span class="font-normal">{{- product.selected_or_first_available_variant.sku -}}</span>
+  {%- endif -%}
+</p>

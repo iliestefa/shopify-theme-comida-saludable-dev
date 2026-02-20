@@ -1,0 +1,229 @@
+/*
+* ------------------------------------------------------------
+* IMPORTANT: The contents of this file are auto-generated.
+*
+* This file may be updated by the Shopify admin theme editor
+* or related systems. Please exercise caution as any changes
+* made to this file may be overwritten.
+* ------------------------------------------------------------
+*/
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "blocks": {
+        "slide-0": {
+          "type": "slide",
+          "settings": {
+            "use_video": false,
+            "overlay_type": "dark",
+            "heading": "Hero Slide",
+            "description": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>",
+            "color": "#ffffff",
+            "button_text_1": "First Button",
+            "button_url_1": "",
+            "button_text_2": "Second Button",
+            "button_url_2": ""
+          }
+        },
+        "slide_yDzW94": {
+          "type": "slide",
+          "settings": {
+            "use_video": false,
+            "overlay_type": "dark",
+            "heading": "Lorem ipsum",
+            "description": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>",
+            "color": "#ffffff",
+            "button_text_1": "First Button",
+            "button_url_1": "",
+            "button_text_2": "Second Button",
+            "button_url_2": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide-0",
+        "slide_yDzW94"
+      ],
+      "settings": {
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "hero_mobile_height": 100,
+        "hero_desktop_height": 100
+      }
+    },
+    "featured-collection-0": {
+      "type": "featured-collection",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "heading": "Featured collection",
+        "description": "<p>Discover the difference with our exclusive Lorem Ipsum collection. Elevate your routine with high-quality goods that make a statement.</p>",
+        "collection": "all",
+        "products_to_show": 8,
+        "cta_label": "View all",
+        "show_secondary_image": true,
+        "show_vendor": true,
+        "quick_add": "standard"
+      }
+    },
+    "image_with_text_x6cL3k": {
+      "type": "image-with-text",
+      "blocks": {
+        "image_xetJxU": {
+          "type": "image",
+          "settings": {
+            "justify_content": "center",
+            "rounded_corners": true,
+            "bg_color": "",
+            "use_video_or_image": "image"
+          }
+        },
+        "content_pwTDfX": {
+          "type": "content",
+          "settings": {
+            "justify_content": "start",
+            "rounded_corners": true,
+            "bg_color": "#e1e5e9",
+            "text_color": "#000000",
+            "caption": "Caption text",
+            "heading_text": "<p>Image and Text</p>",
+            "description": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio amet a illo eaque eligendi dignissimos alias optio quas, ipsam sint facilis eum vitae provident consequatur repellat cupiditate sed quisquam consequuntur tempore vel. In explicabo omnis ducimus, error a natus nemo!</p>",
+            "button_text_1": "Shop Women",
+            "button_link_1": "",
+            "button_text_2": "Shop Men",
+            "button_link_2": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_xetJxU",
+        "content_pwTDfX"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "container_width": "medium",
+        "container_spacer_type": "padding",
+        "section_id": ""
+      }
+    },
+    "image_and_coordinate_points_kz9WKE": {
+      "type": "image-and-coordinate-points",
+      "blocks": {
+        "feature_i6DV8g": {
+          "type": "feature",
+          "settings": {
+            "position_x": 27,
+            "position_y": 60,
+            "heading": "Consectetur adipisicing",
+            "description": "<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum, tempora.</p>",
+            "description_position": "left-center"
+          }
+        },
+        "feature_8tJypM": {
+          "type": "feature",
+          "settings": {
+            "position_x": 40,
+            "position_y": 35,
+            "heading": "Laboris nisi ut aliquip",
+            "description": "<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+            "description_position": "bottom-right"
+          }
+        },
+        "feature_cHAwYe": {
+          "type": "feature",
+          "settings": {
+            "position_x": 70,
+            "position_y": 50,
+            "heading": "Provident nostrum",
+            "description": "<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Corporis magni veniam reiciendis, provident nostrum vero!</p>",
+            "description_position": "right-center"
+          }
+        },
+        "feature_XJM7Pr": {
+          "type": "feature",
+          "settings": {
+            "position_x": 50,
+            "position_y": 70,
+            "heading": "Voluptate velit",
+            "description": "<p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.</p>",
+            "description_position": "top-center"
+          }
+        }
+      },
+      "block_order": [
+        "feature_i6DV8g",
+        "feature_8tJypM",
+        "feature_cHAwYe",
+        "feature_XJM7Pr"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "container_width": "medium",
+        "container_spacer_type": "padding",
+        "heading": "Dynamic coordinates",
+        "description": "<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum, tempora.</p>",
+        "show_markers_in_desktop": true,
+        "section_id": ""
+      }
+    },
+    "collapsible_content_qmWWDz": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_mkG7az": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Excepteur sint occaecat cupidatat non proident",
+            "content": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa iste porro, inventore perferendis nam impedit facere ea adipisci autem iusto ratione doloremque repellat, asperiores, cum eligendi itaque necessitatibus mollitia commodi.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_DdtkBn": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
+            "content": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa iste porro, inventore perferendis nam impedit facere ea adipisci autem iusto ratione doloremque repellat, asperiores, cum eligendi itaque necessitatibus mollitia commodi.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_azXUWD": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+            "content": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa iste porro, inventore perferendis nam impedit facere ea adipisci autem iusto ratione doloremque repellat, asperiores, cum eligendi itaque necessitatibus mollitia commodi.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_N6qwF3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+            "content": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa iste porro, inventore perferendis nam impedit facere ea adipisci autem iusto ratione doloremque repellat, asperiores, cum eligendi itaque necessitatibus mollitia commodi.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_mkG7az",
+        "collapsible_row_DdtkBn",
+        "collapsible_row_azXUWD",
+        "collapsible_row_N6qwF3"
+      ],
+      "settings": {
+        "color_scheme": "",
+        "container_width": "medium",
+        "container_spacer_type": "padding",
+        "heading": "Collapsible Content",
+        "description": "<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum, tempora.</p>",
+        "open_first_collapsible_row": true,
+        "section_id": ""
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "featured-collection-0",
+    "image_with_text_x6cL3k",
+    "image_and_coordinate_points_kz9WKE",
+    "collapsible_content_qmWWDz"
+  ]
+}

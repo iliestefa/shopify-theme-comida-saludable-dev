@@ -1,0 +1,290 @@
+<sticky-header
+  data-sticky-type="{{ section.settings.sticky_header_type }}"
+  class="relative block color-{{ section.settings.color_scheme }} gradient"
+>
+  <header class="c-container grid grid-cols-[1fr_2fr_1fr] lg:grid-cols-[1fr_auto_1fr] gap-4 py-4">
+    {%- render 'header-drawer' -%}
+
+    <div class="flex lg-down:justify-center">
+      <a href="{{ routes.root_url }}" class="flex">
+        {%- if settings.logo != blank -%}
+          {%- capture logo_style -%}
+            max-width: {{ settings.logo_width }}px;
+          {%- endcapture -%}
+
+          {%- render 'image-element',
+            image: settings.logo,
+            fixed_width: 500,
+            preload: true,
+            class: 'header__heading-logo motion-reduce',
+            style: logo_style
+          -%}
+        {%- else -%}
+          <span class="h2">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    {%- render 'header-menu' -%}
+
+    <div class="flex flex-row justify-end items-center gap-5">
+      {%- if section.settings.enable_country_selector or section.settings.enable_language_selector -%}
+        <div class="hidden lg:flex flex-row items-center gap-4">
+          {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+            {%- render 'country-selector', local_position: 'Header' -%}
+          {% endif %}
+
+          {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+            {%- render 'language-selector', local_position: 'Header' -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {% render 'header-search' %}
+
+      {%- if shop.customer_accounts_enabled -%}
+        <a
+          href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+          class="flex group"
+        >
+          {%- render 'icon-account', class: 'h-8 transition-transform group-hover:scale-105' -%}
+          <span class="sr-only">
+            {%- if customer -%}
+              {{- 'customer.account_fallback' | t -}}
+            {%- else -%}
+              {{- 'customer.log_in' | t -}}
+            {%- endif -%}
+          </span>
+        </a>
+      {%- endif -%}
+
+      <a
+        href="{{ routes.cart_url }}"
+        class="flex js-cart-drawer-trigger relative group"
+      >
+        {%- render 'icon-cart', class: 'h-8 transition-transform group-hover:scale-105' -%}
+        <span class="sr-only">{{ 'templates.cart.cart' | t }}</span>
+        <div
+          class="cart-count-container hide-if-cart-empty absolute -bottom-2 -right-2 rounded-full w-6 h-6 bg-white body-4 flex justify-center items-center show-md"
+          style="color: rgba(var(--color-foreground));"
+        >
+          <span aria-hidden="true" class="cart-count text-black" style="color: rgb(var(--color-background));">
+            {{- cart.item_count -}}
+          </span>
+        </div>
+      </a>
+    </div>
+  </header>
+</sticky-header>
+
+<script>
+  function setHeaderHeight() {
+    const header = document.querySelector('.section-header');
+    const announcement = document.querySelector('.section-announcement');
+    const headerHeight = header.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const announcementHeight = announcement ? announcement.offsetHeight : 0;
+
+    const doctStyle = document.documentElement.style;
+    doctStyle.setProperty('--header-height', `${headerHeight}px`);
+    doctStyle.setProperty('--full-header-height', `${headerHeight + announcementHeight}px`);
+    doctStyle.setProperty('--viewport-height', `${windowHeight}px`);
+    doctStyle.setProperty('--viewport-available-height', `${windowHeight - headerHeight - announcementHeight}px`);
+  }
+
+  setHeaderHeight();
+  window.addEventListener('resize', this.setHeaderHeight);
+</script>
+
+{% javascript %}
+  class StickyHeader extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.header = document.querySelector('.section-header');
+      this.headerIsAlwaysSticky = this.getAttribute('data-sticky-type') === 'always';
+      this.headerBounds = {};
+
+      if (this.headerIsAlwaysSticky) {
+        this.header.classList.add('shopify-section-header-sticky');
+      }
+
+      this.currentScrollTop = 0;
+
+      this.onScrollHandler = this.onScroll.bind(this);
+      window.addEventListener('scroll', this.onScrollHandler, false);
+
+      this.createObserver();
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener('scroll', this.onScrollHandler);
+    }
+
+    createObserver() {
+      let observer = new IntersectionObserver((entries, observer) => {
+        this.headerBounds = entries[0].intersectionRect;
+        observer.disconnect();
+      });
+
+      observer.observe(this.header);
+    }
+
+    onScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+        this.header.classList.add('scrolled-past-header');
+        if (this.preventHide) return;
+        requestAnimationFrame(this.hide.bind(this));
+      } else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+        this.header.classList.add('scrolled-past-header');
+        requestAnimationFrame(this.reveal.bind(this));
+      } else if (scrollTop <= this.headerBounds.top) {
+        this.header.classList.remove('scrolled-past-header');
+        requestAnimationFrame(this.reset.bind(this));
+      }
+
+      this.currentScrollTop = scrollTop;
+    }
+
+    hide() {
+      if (this.headerIsAlwaysSticky) return;
+      this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky');
+    }
+
+    reveal() {
+      if (this.headerIsAlwaysSticky) return;
+      this.header.classList.add('shopify-section-header-sticky', 'animate');
+      this.header.classList.remove('shopify-section-header-hidden');
+    }
+
+    reset() {
+      if (this.headerIsAlwaysSticky) return;
+      this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky', 'animate');
+    }
+  }
+
+  customElements.define('sticky-header', StickyHeader);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "Menu"
+    },
+    {
+      "type": "select",
+      "id": "sticky_header_type",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "on-scroll-up",
+          "label": "On scroll up"
+        },
+        {
+          "value": "always",
+          "label": "Always"
+        }
+      ],
+      "default": "on-scroll-up",
+      "label": "Sticky header"
+    },
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Section color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "menu_color_scheme",
+      "label": "Menu color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Country/region selector",
+      "info": "To add a country/region, go to your [market settings.](/admin/settings/markets)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "Enable country/region selector"
+    },
+    {
+      "type": "header",
+      "content": "Language selector",
+      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "Enable language selector"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega-menu",
+      "name": "Mega Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Mega menu"
+        },
+        {
+          "type": "range",
+          "id": "index",
+          "min": 1,
+          "max": 10,
+          "step": 1,
+          "label": "Mega menu index",
+          "info": "The index determines the order of the mega menu.",
+          "default": 1
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "default": "main-menu",
+          "label": "Megamenu main menu"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Megamenu image"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "CTA Link"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Megamenu description",
+          "default": "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa iste porro, inventore perferendis nam impedit facere ea adipisci autem iusto ratione doloremque repellat, asperiores, cum eligendi itaque necessitatibus mollitia commodi.</p>"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

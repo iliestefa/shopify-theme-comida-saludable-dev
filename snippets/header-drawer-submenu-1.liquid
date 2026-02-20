@@ -1,0 +1,78 @@
+{%- assign mega_menu_block = mega_menu_block | default: blank -%}
+
+<div
+  class="w-full"
+  x-data="
+    {
+      openSubMenu1: false,
+      onOpenSubmenu1() {
+        this.openSubMenu1 = true;
+      },
+      onCloseSubmenu1() {
+        this.openSubMenu1 = false;
+      }
+    }
+  "
+  @nav-drawer-closed.window="onCloseSubmenu1()"
+>
+  <button
+    type="button"
+    class="w-full flex flex-row gap justify-between items-center px-8 py-4 body-2"
+    :aria-expanded="openSubMenu1"
+    x-on:click="onOpenSubmenu1()"
+  >
+    <span>{{ link.title | escape }}</span>
+    {%- render 'icon-arrow' -%}
+  </button>
+
+  <div
+    class="fixed w-full max-w-[420px] h-[calc(100%-80px)] top-[80px] left-0 z-[5] gradient color-{{ section.settings.menu_color_scheme }}"
+    style="display:none;"
+    x-trap="openSubMenu1"
+    x-show="openSubMenu1"
+    x-transition:enter="transition-all ease-out duration-200"
+    x-transition:enter-start="!-left-full"
+    x-transition:enter-end="left-0"
+    x-transition:leave="transition-all ease-in duration-200"
+    x-transition:leave-start="left-0"
+    x-transition:leave-end="!-left-full"
+  >
+    <div class="relative h-full grid grid-rows-[auto_1fr]">
+      <button
+        class="w-full flex px-8 py-4 body-2"
+        x-on:click="onCloseSubmenu1()"
+      >
+        <span class="flex flex-row gap-4">
+          {%- render 'icon-arrow', class: 'w-4 rotate-180' -%}
+          {{- link.title | escape -}}
+        </span>
+      </button>
+
+      <div class="overflow-y-auto">
+        {%- if mega_menu_block != blank -%}
+          {%- render 'header-drawer-megamenu', block: mega_menu_block -%}
+        {%- else -%}
+          <ul class="w-full flex flex-col" role="list" tabindex="-1">
+            {%- for childlink in link.links -%}
+              <li>
+                {%- if childlink.links == blank -%}
+                  <a
+                    href="{{ childlink.url }}"
+                    class="flex px-8 py-4 body-2"
+                    {% if childlink.current %}
+                      aria-current="page"
+                    {% endif %}
+                  >
+                    {{- childlink.title | escape -}}
+                  </a>
+                {%- else -%}
+                  {%- render 'header-drawer-submenu-2', link: childlink -%}
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>

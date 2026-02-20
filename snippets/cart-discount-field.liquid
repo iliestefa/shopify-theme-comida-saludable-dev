@@ -1,0 +1,118 @@
+{%- liquid
+  assign active_discount_codes = cart.discount_applications | where: 'type', 'discount_code' | map: 'title'
+  assign active_discount_codes = active_discount_codes | compact | uniq
+  assign active_discount_codes_json = active_discount_codes | json | replace: '"', "'"
+-%}
+
+<div
+  class="flex flex-col gap-y-2 w-full"
+  x-data="
+    {
+      discountCode: '',
+      activeDiscountCodes: {{ active_discount_codes_json }},
+      errorMessage: null,
+      isLoading: false,
+      enableStackDiscounts: {{ settings.cart_stack_discount_codes | json }},
+      applyDiscount() {
+        this.setDiscount();
+      },
+      async setDiscount() {
+        if (this.discountCode == '') {
+          this.errorMessage = 'Please enter a discount code';
+          return;
+        }
+
+        if (this.activeDiscountCodes.includes(this.discountCode.toUpperCase())) {
+          this.errorMessage = 'Discount code is already in use';
+          return;
+        }
+
+        this.isLoading = true;
+        let isValidDiscount = false;
+
+        let combinedDiscounts = this.discountCode;
+        if (this.enableStackDiscounts) {
+          combinedDiscounts = this.activeDiscountCodes.concat(this.discountCode).join(',');
+        }
+
+        await fetch(`${Shopify.routes.root}checkout?discount=${combinedDiscounts}&=${Date.now()}`)
+        await fetch(`/cart.js`)
+          .then(response => response.json())
+          .then(cart => {
+            cart.cart_level_discount_applications.forEach(discount => {
+              if (discount.type == 'discount_code' && discount.title.toUpperCase() == this.discountCode.toUpperCase()) {
+                isValidDiscount = true;
+              }
+            });
+
+            cart.items.forEach(item => {
+              item.line_level_discount_allocations.forEach(discount => {
+                let discountApplication = discount.discount_application;
+                if (discountApplication.type == 'discount_code' && discountApplication.title.toUpperCase() == this.discountCode.toUpperCase()) {
+                  isValidDiscount = true;
+                }
+              });
+            });
+          });
+
+        if (isValidDiscount) {
+          if (this.enableStackDiscounts) {
+            this.activeDiscountCodes.push(this.discountCode.toUpperCase());
+          } else {
+            this.activeDiscountCodes = [this.discountCode.toUpperCase()];
+          }
+
+          await this.getCartAndDrawerUpdated();
+          this.isLoading = false;
+          this.discountCode = '';
+
+        } else {
+          this.isLoading = false;
+          this.discountCode = '';
+          this.errorMessage = 'Invalid discount code';
+
+          if (!this.enableStackDiscounts) {
+            setTimeout(() => this.getCartAndDrawerUpdated(), 2000);
+          }
+        }
+      },
+      init() {
+        this.$watch('errorMessage', () => {
+          if (this.errorMessage != null) {
+            setTimeout(() => this.errorMessage = null, 3000);
+          }
+        });
+      },
+      async getCartAndDrawerUpdated() {
+        await Alpine.store('cart').getCartAndDrawerUpdated();
+      }
+    }
+  "
+>
+  <div
+    class="bg-red-600 px-3 py-1 rounded-md text-white"
+    x-text="errorMessage"
+    x-show="errorMessage != null"
+    style="display: none;"
+    x-transition
+  ></div>
+
+  <div class="flex flex-row items-center gap-3 justify-between">
+    <input
+      type="text"
+      class="form__input w-full"
+      placeholder="Discount Code"
+      x-model="discountCode"
+      x-on:keydown.enter.prevent="applyDiscount"
+    >
+
+    <button
+      class="button-secondary !w-max text-nowrap"
+      @click="applyDiscount"
+      :class="{ 'processing-spinner': isLoading }"
+      style="--spinner-color: #000000;"
+    >
+      <span>Apply</span>
+    </button>
+  </div>
+</div>

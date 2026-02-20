@@ -1,0 +1,58 @@
+.base-button {
+  @apply flex justify-center items-center gap-2 text-center;
+  @apply xs-down:text-[14px] text-[16px] leading-[1.25] font-semibold;
+  @apply border border-solid rounded-full px-6;
+
+  &:not(.tiny):not(.small):not(.medium):not(.big) {
+    @apply py-4;
+  }
+
+  &.tiny {
+    @apply py-1.5 px-3.5 text-[14px];
+  }
+
+  &.small {
+    @apply py-2.5;
+  }
+
+  &.medium {
+    @apply py-5;
+  }
+
+  &.big {
+    @apply py-6;
+  }
+
+  &.no-borders {
+    @apply border-none;
+  }
+}
+
+.button-primary {
+  @apply base-button bg-primary text-white border-primary;
+
+  svg {
+    @apply fill-white;
+  }
+
+  &:hover:not(.no-hover) {
+    @apply bg-primary-dark border-primary-dark shadow-primary-dark shadow-[0_0_0_0.1rem];
+  }
+
+  &[disabled],
+  &.disabled {
+    @apply bg-primary-light border-primary-light cursor-not-allowed;
+  }
+}
+
+.button-secondary {
+  @apply base-button bg-transparent border-secondary text-secondary;
+
+  svg {
+    @apply fill-secondary;
+  }
+
+  &:hover:not(.no-hover) {
+    @apply bg-transparent border-secondary-dark shadow-secondary-dark shadow-[0_0_0_0.1rem];
+  }
+}

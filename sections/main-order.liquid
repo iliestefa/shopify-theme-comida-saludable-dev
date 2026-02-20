@@ -1,0 +1,240 @@
+<section
+  role="region"
+  aria-label="{{ 'customer.order.title' | t: name: order.name }}"
+  class="w-full py-8 lg:py-12"
+>
+  <div class="c-container flex flex-col gap-y-5">
+    <div clas="flex flex-col gap-y-3">
+      <h1 class="h2">{{ 'customer.order.title' | t: name: order.name }}</h1>
+      <a href="{{ routes.account_url }}" class=" body-4 font-semibold">
+        {%- render 'icon-arrow', class: 'w-4 rotate-180 inline-block' -%}
+        <span class="underline">{{ 'customer.account.return' | t }}</span>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 items-start gap-5">
+      <div class="col-span-1 lg:col-span-3 shadow-card rounded-[15px] overflow-hidden border border-gray-300">
+        <div class="flex flex-col gap-y-1 border-b border-b-gray-300 p-4">
+          <b>{{ 'customer.order.title' | t: name: order.name }}</b>
+
+          {%- assign order_date = order.created_at | time_tag: format: 'date_at_time' -%}
+          <p>{{ 'customer.order.date_html' | t: date: order_date }}</p>
+
+          {%- if order.cancelled -%}
+            {%- assign cancelled_at = order.cancelled_at | time_tag: format: 'date_at_time' -%}
+            <p>{{ 'customer.order.cancelled_html' | t: date: cancelled_at }}</p>
+            <p>{{ 'customer.order.cancelled_reason' | t: reason: order.cancel_reason_label }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- for line_item in order.line_items -%}
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 p-4 border-b border-b-gray-300 {% cycle 'bg-gray-200/50', '' %}">
+            <div class="col-span-1 md:col-span-2 flex flex-col gap-y-3">
+              <div class="flex flex-row items-center gap-4">
+                <a
+                  class="w-[70px] shrink-0 rounded-[5px] overflow-hidden border border-gray-300"
+                  href="{{ line_item.url }}"
+                  tabindex="-1"
+                >
+                  {%- render 'image-element',
+                    image: line_item.image,
+                    fixed_width: 300,
+                    class: 'w-full',
+                    priority: true
+                  -%}
+                </a>
+
+                <div class="flex flex-col gap-y-1">
+                  {%- if line_item.sku != blank -%}
+                    <span class="body-4">{{ line_item.sku }}</span>
+                  {%- endif -%}
+
+                  <a class="h5" href="{{ line_item.url }}">{{ line_item.title }}</a>
+                </div>
+              </div>
+
+              {%- assign property_size = line_item.properties | size -%}
+              {%- unless line_item.selling_plan_allocation == null and property_size == 0 -%}
+                <div class="flex flex-col gap-y-2 body-4">
+                  {%- unless line_item.selling_plan_allocation == null -%}
+                    <div>
+                      {{- line_item.selling_plan_allocation.selling_plan.name -}}
+                    </div>
+                  {%- endunless -%}
+
+                  {%- if property_size != 0 -%}
+                    {%- for property in line_item.properties -%}
+                      {% assign property_first_char = property.first | slice: 0 %}
+                      {%- if property.last != blank and property_first_char != '_' -%}
+                        <div>
+                          <span class="font-bold">{{ property.first }}:</span>
+                          <span>
+                            {%- if property.last contains '/uploads/' -%}
+                              <a href="{{ property.last }}">{{ property.last | split: '/' | last }}</a>
+                            {%- else -%}
+                              {{ property.last }}
+                            {%- endif -%}
+                          </span>
+                        </div>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+                </div>
+              {%- endunless -%}
+
+              {%- if line_item.line_level_discount_allocations != blank -%}
+                <ul class="flex flex-col gap-y-1 body-4" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                  {%- for discount_allocation in line_item.line_level_discount_allocations -%}
+                    <li class="flex flex-row gap-2 items-center">
+                      {%- render 'icon-discount' -%}
+                      {{- discount_allocation.discount_application.title }}
+                      (-{{ discount_allocation.amount | money }})
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+
+              {%- if line_item.fulfillment -%}
+                <div class="flex flex-col gap-y-1 p-2 rounded-[5px] border border-gray-300 body-4 w-max">
+                  {%- assign created_at = line_item.fulfillment.created_at | time_tag: format: 'date' -%}
+                  <span>{{ 'customer.order.fulfilled_at_html' | t: date: created_at }}</span>
+
+                  <a href="{{ line_item.fulfillment.tracking_url }}" class="underline font-semibold" target="_blank">
+                    {{ line_item.fulfillment.tracking_company }}
+                    #{{ line_item.fulfillment.tracking_number }}
+                  </a>
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="col-span-1 flex flex-col md:justify-center gap-y-3 body-4">
+              <div class="flex flex-row justify-between gap-4">
+                <span class="font-semibold">{{ 'customer.order.price' | t }}:</span>
+                <div class="flex flex-col gap-y-1 items-end">
+                  {%- if line_item.original_price != line_item.final_price -%}
+                    <s class="leading-[1] text-disabled">{{ line_item.original_price | money }}</s>
+                  {%- endif -%}
+                  <span class="leading-[1]">{{ line_item.final_price | money }}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-row justify-between gap-4">
+                <span class="font-semibold">{{ 'customer.order.quantity' | t }}:</span>
+                <span>{{ line_item.quantity }}</span>
+              </div>
+
+              <div class="flex flex-row justify-between gap-4">
+                <span class="font-semibold">{{ 'customer.order.total' | t }}:</span>
+
+                <div class="flex flex-col gap-y-1 items-end">
+                  {%- if line_item.original_line_price != line_item.final_line_price -%}
+                    <s class="leading-[1] text-disabled">{{ line_item.original_line_price | money }}</s>
+                  {%- endif -%}
+                  <span class="leading-[1]">{{ line_item.final_line_price | money }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+
+        <div class="w-full flex flex-col gap-y-3 p-4">
+          <div class="flex flex-row justify-between gap-4">
+            <div>
+              {{- 'customer.order.subtotal' | t -}}
+            </div>
+
+            <div class="text-right text-nowrap">
+              {{- order.line_items_subtotal_price | money -}}
+            </div>
+          </div>
+
+          {%- for discount_application in order.cart_level_discount_applications -%}
+            <div class="flex flex-row justify-between gap-4">
+              <div class="flex flex-row items-center gap-2">
+                {%- render 'icon-discount', class: 'w-4' -%}
+                <span>{{- discount_application.title -}}</span>
+              </div>
+
+              <div class="text-right text-nowrap">-{{ discount_application.total_allocated_amount | money }}</div>
+            </div>
+          {%- endfor -%}
+
+          {%- for shipping_method in order.shipping_methods -%}
+            <div class="flex flex-row justify-between gap-4">
+              <div>{{ 'customer.order.shipping' | t }} ({{ shipping_method.title }})</div>
+
+              <div class="text-right text-nowrap">
+                {{- shipping_method.price | money -}}
+              </div>
+            </div>
+          {%- endfor -%}
+
+          {%- for tax_line in order.tax_lines -%}
+            <div class="flex flex-row justify-between gap-4">
+              <div>
+                <span>{{ 'customer.order.tax' | t }}</span>
+                <span>
+                  ({{ tax_line.title }}
+                  {{ tax_line.rate | times: 100 }}%)
+                </span>
+              </div>
+
+              <div class="text-right text-nowrap">
+                {{- tax_line.price | money -}}
+              </div>
+            </div>
+          {%- endfor -%}
+
+          {%- if order.total_duties -%}
+            <div class="flex flex-row justify-between gap-4">
+              <div>{{ 'customer.order.total_duties' | t }}</div>
+              <div class="text-right text-nowrap">{{- order.total_duties | money -}}</div>
+            </div>
+          {%- endif -%}
+
+          {%- if order.total_refunded_amount > 0 -%}
+            <div class="flex flex-row justify-between gap-4">
+              <div>{{- 'customer.order.total_refunded' | t -}}</div>
+              <div class="text-right text-nowrap">-{{ order.total_refunded_amount | money_with_currency }}</div>
+            </div>
+          {%- endif -%}
+
+          <div class="flex flex-row justify-between gap-4">
+            <div class="h4">{{ 'customer.order.total' | t }}</div>
+
+            <div class="body-1 text-right font-medium text-nowrap">
+              {{- order.total_net_amount | money_with_currency -}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-span-1 flex flex-col gap-y-8 p-4 shadow-card rounded-[15px] overflow-hidden border border-gray-300">
+        <div class="flex flex-col gap-y-3">
+          <h2 class="h4">{{ 'customer.order.billing_address' | t }}</h2>
+          <p>
+            <span class="font-semibold">{{ 'customer.order.payment_status' | t }}:</span>
+            <span>{{ order.financial_status_label }}</span>
+          </p>
+          {{ order.billing_address | format_address }}
+        </div>
+
+        <div class="flex flex-col gap-y-3">
+          <h2 class="h4">{{ 'customer.order.shipping_address' | t }}</h2>
+          <p>
+            <span class="font-semibold">{{ 'customer.order.fulfillment_status' | t }}:</span>
+            <span>{{ order.fulfillment_status_label }}</span>
+          </p>
+          {{ order.shipping_address | format_address }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Order",
+  "settings": []
+}
+{% endschema %}

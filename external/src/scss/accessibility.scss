@@ -1,0 +1,22 @@
+html:not(.focus-is-visible) {
+  *:not(.form__input):focus,
+  *:not(.form__input):focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+.focus-is-visible {
+  .sr-only:focus-visible + label,
+  label:has(+ input.sr-only:focus) {
+    outline: 2px auto;
+  }
+}
+
+.skip-to-content-link:focus {
+  z-index: 9999;
+  overflow: auto;
+  width: auto;
+  height: auto;
+  clip: auto;
+}

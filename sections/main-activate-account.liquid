@@ -1,0 +1,112 @@
+<section class="w-full py-12">
+  <div class="c-container max-w-[700px] flex flex-col gap-y-8">
+    <h1 class="h2 text-center">
+      {{- 'customer.activate_account.title' | t -}}
+    </h1>
+
+    <p class="body-3 richtext text-center">
+      {{- 'customer.activate_account.subtext' | t -}}
+    </p>
+
+    {%- form 'activate_customer_password', class: 'w-full flex flex-col gap-y-5' -%}
+      {%- if form.errors -%}
+        <div class="richtext text-error body-4 flex flex-col gap-y-2">
+          <div class="flex flex-row items-center gap-1" role="alert" tabindex="-1" autofocus>
+            {%- render 'icon-error', class: 'w-4' -%}
+            <span>{{ 'templates.contact.form.error_heading' | t }}</span>
+          </div>
+
+          <ul class="flex flex-col gap-y-1 list-disc list-inside">
+            {%- for field in form.errors -%}
+              <li>
+                {%- if field == 'form' -%}
+                  {{ form.errors.messages[field] }}
+                {%- else -%}
+                  <a href="#{{ field }}">
+                    {{ form.errors.translated_fields[field] | capitalize }}
+                    {{ form.errors.messages[field] }}
+                  </a>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      <div class="flex flex-col gap-y-1">
+        <label class="form__label" for="password">
+          {{- 'customer.activate_account.password' | t -}}
+        </label>
+
+        <input
+          type="password"
+          name="customer[password]"
+          id="password"
+          class="form__input"
+          autocomplete="new-password"
+          placeholder="{{ 'customer.activate_account.password' | t }}"
+          {% if form.errors contains 'password' %}
+            aria-invalid="true"
+            aria-describedby="password-error"
+          {% endif %}
+        >
+
+        {%- if form.errors contains 'password' -%}
+          <div id="password-error" class="text-error body-5 richtext flex flex-row items-center gap-1">
+            {%- render 'icon-error', class: 'w-4' -%}
+            <span>
+              {{- form.errors.translated_fields.password | capitalize }}
+              {{ form.errors.messages.password -}}
+            </span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="flex flex-col gap-y-1">
+        <label class="form__label" for="password_confirmation">
+          {{ 'customer.activate_account.password_confirm' | t }}
+        </label>
+
+        <input
+          type="password"
+          name="customer[password_confirmation]"
+          id="password_confirmation"
+          class="form__input"
+          autocomplete="new-password"
+          placeholder="{{ 'customer.activate_account.password_confirm' | t }}"
+          {% if form.errors contains 'password' %}
+            aria-invalid="true"
+            aria-describedby="password_confirmation-error"
+          {% endif %}
+        >
+
+        {%- if form.errors contains 'password_confirmation' -%}
+          <div id="password_confirmation-error" class="text-error body-5 richtext flex flex-row items-center gap-1">
+            {%- render 'icon-error', class: 'w-4' -%}
+            <span>
+              {{ form.errors.translated_fields.password_confirmation | capitalize }}
+              {{ form.errors.messages.password_confirmation }}
+            </span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="flex flex-row gap-5 items-center justify-center">
+        <button class="button-primary medium">
+          {{- 'customer.activate_account.submit' | t -}}
+        </button>
+
+        <button name="decline" class="button-secondary medium">
+          {{ 'customer.activate_account.cancel' | t }}
+        </button>
+      </div>
+    {%- endform -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Account activation",
+  "settings": []
+}
+{% endschema %}

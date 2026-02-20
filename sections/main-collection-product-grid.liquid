@@ -1,0 +1,197 @@
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+
+<div class="c-container flex flex-col gap-y-5 md:gap-y-10 py-10 relative gradient color-{{ section.settings.color_scheme }}">
+  {%- paginate collection.products by section.settings.products_per_page -%}
+    {%- if section.settings.enable_sorting -%}
+      {%- render 'collection-sort', collection: collection -%}
+    {%- endif -%}
+
+    <div class="grid grid-cols-1 {% if section.settings.enable_filtering %} md:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-10 {% endif %}">
+      {%- if section.settings.enable_filtering -%}
+        <aside
+          aria-labelledby="Filters"
+          class="col-span-1"
+          id="main-collection-filters"
+          data-id="{{ section.id }}"
+        >
+          {%- render 'facets',
+            results: collection,
+            enable_sorting: section.settings.enable_sorting,
+            paginate: paginate
+          -%}
+        </aside>
+      {%- endif -%}
+
+      <div
+        class="col-span-1 {% if section.settings.enable_filtering %} md:col-span-2 lg:col-span-3 {% endif %}"
+        id="ProductGridContainer"
+      >
+        <div class="loading-overlay gradient"></div>
+
+        {%- if collection.products.size == 0 -%}
+          <div
+            class="w-full"
+            id="product-grid"
+            data-id="{{ section.id }}"
+          >
+            <h2 class="body-3 text-center py-12">
+              {{ 'sections.collection_template.empty' | t -}}
+              <br>
+              {{
+                'sections.collection_template.use_fewer_filters_html'
+                | t: link: collection.url, class: 'underline underline-offset-2'
+              }}
+            </h2>
+          </div>
+        {%- else -%}
+          <div class="collection flex flex-col gap-y-5">
+            {%- assign columns_desktop = 'lg:grid-cols-3' -%}
+            {%- case section.settings.columns_desktop -%}
+              {%- when 2 -%}
+                {%- assign columns_desktop = 'lg:grid-cols-2' -%}
+              {%- when 3 -%}
+                {%- assign columns_desktop = 'lg:grid-cols-3' -%}
+              {%- when 4 -%}
+                {%- assign columns_desktop = 'lg:grid-cols-4' -%}
+              {%- when 5 -%}
+                {%- assign columns_desktop = 'lg:grid-cols-5' -%}
+            {%- endcase -%}
+
+            {%- assign columns_mobile = 'grid-cols-1' -%}
+            {%- case section.settings.columns_mobile -%}
+              {%- when '1' -%}
+                {%- assign columns_mobile = 'grid-cols-1' -%}
+              {%- when '2' -%}
+                {%- assign columns_mobile = 'grid-cols-2' -%}
+            {%- endcase -%}
+
+            <ul
+              id="product-grid"
+              data-id="{{ section.id }}"
+              class="grid {{ columns_mobile }} md:grid-cols-2 {{ columns_desktop }} gap-x-3 md:gap-x-5 gap-y-5"
+            >
+              {%- for product in collection.products -%}
+                {% assign priority = false %}
+                {%- if forloop.index <= 3 -%}
+                  {%- assign priority = true -%}
+                {%- endif -%}
+
+                <li class="w-full">
+                  {%- render 'card-product',
+                    product: product,
+                    show_secondary_image: section.settings.show_secondary_image,
+                    show_vendor: section.settings.show_vendor,
+                    quick_add: section.settings.quick_add,
+                    priority: priority
+                  -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+
+            {%- if paginate.pages > 1 -%}
+              {% render 'pagination', paginate: paginate, anchor: '' %}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "Product Grid",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 36,
+      "step": 1,
+      "default": 18,
+      "label": "Products per page"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Number of columns on desktop"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "default": "2",
+      "label": "Number of columns on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Product card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": true,
+      "label": "Show second image on hoverl"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": true,
+      "label": "Show vendor"
+    },
+    {
+      "type": "select",
+      "id": "quick_add",
+      "default": "none",
+      "label": "Quick add",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Filtering and sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "default": true,
+      "label": "Enable filtering",
+      "info": "Customize filters with the Search & Discovery app. [Learn more](https://help.shopify.com/manual/online-store/search-and-discovery/filters)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "default": true,
+      "label": "Enable sorting"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,7 @@
+{%- assign default_url = request.origin | append: request.path -%}
+{%- assign share_url = share_url | default: default_url -%}
+
+<button class="flex flex-row items-center gap-2 group" onclick="navigator.share({ url: '{{ share_link }}'})">
+  {%- render 'icon-share' -%}
+  <span class="group-hover:underline">{{ label | escape }}</span>
+</button>

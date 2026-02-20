@@ -1,0 +1,64 @@
+<section class="py-8 lg:py-16 color-{{ section.settings.color_scheme }} gradient">
+  <div class="c-container flex flex-col lg:flex-row lg:items-center gap-8">
+    <div class="flex-1 flex flex-col gap-y-5">
+      {%- if collection.title != blank -%}
+        <h1 class="h2">
+          <span class="sr-only">{{ 'sections.collection_template.title' | t }}: </span>
+          {{- collection.title | escape -}}
+        </h1>
+      {%- endif -%}
+
+      {%- if section.settings.show_collection_description and collection.description != blank -%}
+        <div class="richtext body-3">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_collection_image and collection.image -%}
+      <div class="flex-1 rounded-[15px] overflow-hidden">
+        {%- render 'image-element', image: collection.image, max_width: 1000, preload: true -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection Banner",
+  "class": "section",
+  "limit": 1,
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add a description or image by editing your collection. [Learn more](https://help.shopify.com/manual/products/collections/collection-layout)"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "default": true,
+      "label": "Show collection description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "default": true,
+      "label": "Show collection image",
+      "info": "For best results, use an image with a 16:9 aspect ratio. [Learn more](https://help.shopify.com/manual/shopify-admin/productivity-tools/image-editor#understanding-image-aspect-ratio)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Banner",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,24 @@
+<div class="flex flex-col gap-y-1">
+  <div
+    id="price-{{ section.id }}"
+    role="status"
+    {{ block.shopify_attributes }}
+  >
+    {%- render 'price', product: product, use_variant: true, show_badges: true, price_class: 'price--large' -%}
+  </div>
+
+  {%- if product.quantity_price_breaks_configured? -%}
+    <div
+      id="Volume-Note-{{ section.id }}"
+      class="body-4"
+    >
+      {{- 'products.product.volume_pricing.note' | t -}}
+    </div>
+  {%- endif -%}
+
+  {%- if cart.taxes_included -%}
+    <div class="richtext body-4">
+      {{- 'products.product.include_taxes' | t -}}
+    </div>
+  {%- endif -%}
+</div>

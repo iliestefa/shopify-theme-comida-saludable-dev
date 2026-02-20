@@ -1,0 +1,177 @@
+{%- liquid
+  assign sort_by = results.sort_by | default: results.default_sort_by
+  if results.url
+    assign results_url = results.url
+  else
+    assign terms = results.terms | escape
+    assign results_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+  endif
+-%}
+
+<div
+  class="facets-container"
+  x-data="
+    {
+      isOpenFacetsDrawer: false,
+      toggleFacetsDrawer: function () {
+        this.isOpenFacetsDrawer = !this.isOpenFacetsDrawer;
+      },
+      init() {
+        this.$watch('isOpenFacetsDrawer', (value) => {
+          document.body.classList.toggle('overflow-hidden', this.isOpenFacetsDrawer);
+        });
+      }
+    }
+  "
+>
+  <div class="flex flex-row justify-between gap-4 items-center md:hidden">
+    <button
+      type="button"
+      class="flex flex-row items-center gap-2"
+      x-on:click="toggleFacetsDrawer"
+    >
+      {%- render 'icon-filter' -%}
+      <span>Show Filters</span>
+    </button>
+
+    <span id="ProductCount">
+      {%- if results.results_count -%}
+        {{ 'templates.search.results_with_count' | t: terms: results.terms, count: results.results_count }}
+      {%- elsif results.products_count == results.all_products_count -%}
+        {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
+      {%- else -%}
+        {{
+          'products.facets.product_count'
+          | t: product_count: results.products_count, count: results.all_products_count
+        }}
+      {%- endif -%}
+    </span>
+  </div>
+
+  <facet-filters-form class="facets">
+    <form id="FacetFiltersForm">
+      {%- if results.terms -%}
+        <input type="hidden" name="q" value="{{ results.terms | escape }}">
+        <input type="hidden" name="options[prefix]" value="last">
+      {%- endif -%}
+
+      <div class="active-facets-desktop flex flex-col gap-y-5 py-5">
+        <div class="w-full flex flex-row justify-between items-center gap-4 md-down:hidden">
+          {%- unless results.filters == empty -%}
+            <h2 class="h6">
+              {{- 'products.facets.filter_by_label' | t -}}
+            </h2>
+          {%- endunless -%}
+
+          <facet-remove>
+            <a href="{{ results_url }}" class="underline body-4 font-medium">
+              <span>{{ 'products.facets.clear_all' | t }}</span>
+            </a>
+          </facet-remove>
+        </div>
+
+        <div class="flex flex-row flex-wrap gap-3">
+          {%- for filter in results.filters -%}
+            {%- for value in filter.active_values -%}
+              <facet-remove>
+                <a
+                  href="{{ value.url_to_remove }}"
+                  class="flex flex-row items-center gap-2 rounded-[20px] px-3 py-1 border border-gray-300 body-4"
+                >
+                  <span>{{ filter.label | escape }}: {{ value.label | escape }}</span>
+                  {%- render 'icon-close-small', class: 'w-3' -%}
+                  <span class="sr-only">{{ 'products.facets.clear_filter' | t }}</span>
+                </a>
+              </facet-remove>
+            {%- endfor -%}
+
+            {%- if filter.type == 'price_range' -%}
+              {%- assign min = filter.min_value.value -%}
+              {%- assign max = filter.max_value.value -%}
+              {%- if min != null or max != null -%}
+                <facet-remove>
+                  <a
+                    href="{{ filter.url_to_remove }}"
+                    class="flex flex-row items-center gap-2 rounded-[20px] px-3 py-1 border border-gray-300 body-4"
+                  >
+                    <span>{{ min | default: 0 | money }} - {{ max | default: filter.range_max | money }}</span>
+                    {%- render 'icon-close-small' -%}
+                    <span class="sr-only">{{ 'products.facets.clear_filter' | t }}</span>
+                  </a>
+                </facet-remove>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div
+        class="
+          md:!block
+          md-down:translate-x-full md-down:fixed md-down:right-0 md-down:w-full md-down:h-full md-down:top-0 md-down:z-10 md-down:transition-transform md-down:bg-white
+        "
+        :class="
+          {
+            'md-down:translate-x-0': isOpenFacetsDrawer,
+            'md-down:translate-x-full': !isOpenFacetsDrawer,
+          }
+        "
+      >
+        <div class="h-full flex flex-col justify-between">
+          <div class="w-full flex flex-row items-center gap-5 px-5 py-3 border-b border-b-gray-300 md:hidden">
+            <div class="w-full flex flex-col gap-y-2 text-center">
+              <div class="h6">Filter and Sort</div>
+
+              <p class="mobile-facets__count body-4 text-gray-400">
+                {%- if results.results_count -%}
+                  {{ 'templates.search.results_with_count' | t: terms: results.terms, count: results.results_count }}
+                {%- elsif results.products_count == results.all_products_count -%}
+                  {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
+                {%- else -%}
+                  {{
+                    'products.facets.product_count'
+                    | t: product_count: results.products_count, count: results.all_products_count
+                  }}
+                {%- endif -%}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              x-on:click="toggleFacetsDrawer"
+              aria-label="{{ 'accessibility.close' | t }}"
+              class="p-2"
+            >
+              {%- render 'icon-close', class: 'w-6' -%}
+            </button>
+          </div>
+
+          <div class="flex-1 md-down:overflow-y-auto md-down:px-5 md-down:py-5">
+            {%- render 'facets-filters', results: results -%}
+          </div>
+
+          <div class="border-t border-t-gray-300 py-5 flex flex-row flex-wrap justify-center items-center gap-x-8 gap-y-4 md:hidden">
+            <facet-remove>
+              <a href="{{ results_url }}" class="underline body-3">
+                <span>{{ 'products.facets.clear_all' | t }}</span>
+              </a>
+            </facet-remove>
+
+            <button
+              type="button"
+              x-on:click="toggleFacetsDrawer"
+              aria-label="{{ 'accessibility.close' | t }}"
+              class="button-primary"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {% if results.current_vendor or results.current_type %}
+        <input type="hidden" name="q" value="{{ results.current_vendor }}{{ results.current_type }}">
+      {% endif %}
+    </form>
+  </facet-filters-form>
+</div>

@@ -1,0 +1,38 @@
+<div
+  id="cart-drawer-footer"
+  class="flex flex-col gap-y-2 px-4 md:px-5 py-4 border-t border-gray-300"
+>
+  {%- if settings.show_cart_note -%}
+    {%- render 'cart-drawer-note', local_position: 'CartDrawer' -%}
+  {%- endif -%}
+
+  <div class="flex flex-col gap-y-2">
+    {%- render 'cart-discount-list' -%}
+
+    {%- if settings.show_discount_field -%}
+      {%- render 'cart-discount-field' -%}
+    {%- endif -%}
+
+    <div class="flex flex-row justify-between items-center" role="status">
+      <div class="h5">{{ 'sections.cart.estimated_total' | t }}</div>
+      <span class="h4 font-normal text-nowrap">{{ cart.total_price | money }}</span>
+    </div>
+
+    {%- render 'cart-tax-note' -%}
+  </div>
+
+  <div class="flex flex-col gap-y-3">
+    <button
+      type="submit"
+      id="CartDrawer-Checkout"
+      class="button-primary w-full"
+      name="checkout"
+      form="CartDrawer-Form"
+      {% if cart == empty %}
+        disabled
+      {% endif %}
+    >
+      {{- 'sections.cart.checkout' | t -}}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+{% comment %}
+  lazyScripts params []:
+  {
+    src: string, // URL of the script
+    type: string, // 'js' or 'css'
+    callback: function, // Callback function to be executed when the script is loaded
+    lazyOnce: boolean, // Load the script lazy only once
+  }
+
+  <script lazy-src="URL"></script> // Load the script lazy
+  <script lazy-src="URL" lazy-once></script> // Load the script lazy only once
+  <link lazy-src="URL" rel="stylesheet"> // Load the stylesheet lazy
+  <link lazy-src="URL" rel="stylesheet" lazy-once> // Load the stylesheet lazy only once
+{% endcomment %}
+
+<script>
+  (function () {
+    const lazyScripts = [];
+
+    function loadLazyScripts() {
+      lazyScripts.forEach(appendAsset);
+
+      document.querySelectorAll('[lazy-src]').forEach((element) => {
+        const sourceAttr = element.tagName === 'SCRIPT' ? 'src' : 'href';
+        element[sourceAttr] = element.getAttribute('lazy-src');
+        element.removeAttribute('lazy-src');
+      });
+
+      loadHeaderLazyScripts();
+    }
+
+    function loadHeaderLazyScripts() {
+      if (!window.headerLazyScripts) {
+        setTimeout(loadHeaderLazyScripts, 50);
+        return;
+      }
+
+      window.headerLazyScripts
+        .map((script) => ({ src: script, type: script.includes('.css') ? 'css' : 'js' }))
+        .forEach(appendAsset);
+    }
+
+    if (window.localStorage.getItem('userInteractedOnce') != null) {
+      loadLazyOnceScripts();
+    }
+
+    if (window.userHasInteracted) {
+      loadLazyScripts();
+    } else {
+      document.addEventListener('userHasInteracted', loadLazyScripts, { once: true });
+    }
+
+    function loadLazyOnceScripts() {
+      lazyScripts.filter((script) => script.lazyOnce).forEach(appendAsset);
+
+      document.querySelectorAll('[lazy-src][lazy-once]').forEach((element) => {
+        const sourceAttr = element.tagName === 'SCRIPT' ? 'src' : 'href';
+        element[sourceAttr] = element.getAttribute('lazy-src');
+        element.removeAttribute('lazy-src');
+      });
+    }
+  })();
+
+  function appendAsset(script) {
+    if (script.type === 'js') {
+      if (document.querySelector(`script[src="${script.src}"]`)) return;
+
+      const scriptElement = document.createElement('script');
+      scriptElement.src = script.src;
+      scriptElement.type = 'text/javascript';
+      scriptElement.async = true;
+      if (script.callback) scriptElement.onload = script.callback;
+      document.head.appendChild(scriptElement);
+    } else if (script.type === 'css') {
+      if (document.querySelector(`link[href="${script.src}"]`)) return;
+
+      const linkElement = document.createElement('link');
+      linkElement.href = script.src;
+      linkElement.rel = 'stylesheet';
+      document.head.appendChild(linkElement);
+    }
+  }
+</script>

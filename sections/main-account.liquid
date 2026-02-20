@@ -1,0 +1,112 @@
+<section
+  role="region"
+  aria-label="{{ 'customer.account.title' | t }}"
+  class="w-full py-8 lg:py-12"
+>
+  <div class="c-container flex flex-col gap-y-8">
+    <div class="flex flex-row flex-wrap justify-between items-center gap-4">
+      <h1 class="h2">{{ 'customer.account.title' | t }}</h1>
+
+      <a href="{{ routes.account_logout_url }}" class="button-primary small">
+        {{- 'customer.log_out' | t -}}
+      </a>
+    </div>
+
+    <div class="flex-col gap-y-3">
+      <h2 class="h4">{{ 'customer.account.details' | t }}</h2>
+
+      {{ customer.default_address | format_address }}
+
+      <a href="{{ routes.account_addresses_url }}" class="underline font-bold w-max">
+        {{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
+      </a>
+    </div>
+
+    <div class="flex flex-col gap-y-5">
+      <h2 class="h4">{{ 'customer.orders.title' | t }}</h2>
+
+      {%- paginate customer.orders by 20 -%}
+        {%- if customer.orders.size > 0 -%}
+          {%- for order in customer.orders -%}
+            {%- assign order_unique_track_url = blank -%}
+            {%- for item in order.line_items -%}
+              {%- assign line_tracking_url = item.fulfillment.tracking_url -%}
+              {%- if line_tracking_url != blank -%}
+                {%- if order_unique_track_url != blank and order_unique_track_url != line_tracking_url -%}
+                  {%- assign order_unique_track_url = blank -%}
+                  {%- break -%}
+                {%- endif -%}
+
+                {%- assign order_unique_track_url = line_tracking_url -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            <div class="w-full shadow-card border border-gray-300 rounded-[15px] overflow-hidden">
+              <div class="flex flex-row justify-between items-center gap-4 p-4 border-b border-b-gray-300">
+                <div class="font-bold">
+                  {{- 'customer.orders.order_number' | t }}
+                  <a
+                    class="underline"
+                    href="{{ order.customer_url }}"
+                    aria-label="{{ 'customer.orders.view_order' | t }} {{ order.name }}"
+                    tabindex="-1"
+                  >
+                    {{- order.name -}}
+                  </a>
+                </div>
+                <div class="">{{ order.created_at | time_tag: format: 'date' }}</div>
+              </div>
+
+              <div class="flex flex-col md:flex-row gap-4 md:justify-between p-4">
+                <div class="flex flex-col gap-y-3">
+                  <div class="">
+                    <b>{{ 'customer.orders.payment_status' | t }}:</b>
+                    <span>{{ order.financial_status_label }}</span>
+                  </div>
+
+                  <div class="">
+                    <b>{{ 'customer.orders.fulfillment_status' | t }}:</b>
+                    <span>{{ order.fulfillment_status_label }}</span>
+                  </div>
+
+                  <div class="">
+                    <b>{{ 'customer.orders.total' | t }}:</b>
+                    <span>{{ order.total_net_amount | money_with_currency }}</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-y-3">
+                  <a
+                    class="button-primary small"
+                    href="{{ order.customer_url }}"
+                    aria-label="{{ 'customer.orders.view_order' | t }} {{ order.name }}"
+                  >
+                    {{- 'customer.orders.view_order' | t -}}
+                  </a>
+
+                  {%- if order_unique_track_url != blank -%}
+                    <a href="{{ order_unique_track_url }}" class="button-secondary small" target="_blank">
+                      {{- 'customer.orders.track' | t -}}
+                    </a>
+                  {%- endif -%}
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          <p class="w-full text-center">{{ 'customer.orders.none' | t }}</p>
+        {%- endif -%}
+
+        {%- if paginate.pages > 1 -%}
+          {%- render 'pagination', paginate: paginate -%}
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Account"
+}
+{% endschema %}

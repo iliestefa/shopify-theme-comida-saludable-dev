@@ -1,0 +1,16 @@
+{%- comment -%}
+  https://developers.google.com/search/docs/appearance/structured-data
+  https://developers.google.com/search/docs/appearance/structured-data/merchant-listing
+{%- endcomment -%}
+
+{%- render 'schema-organization' -%}
+
+{%- render 'schema-breadcrumb-list' -%}
+
+{%- if request.page_type == 'index' -%}
+  {%- render 'schema-website' -%}
+{%- elsif request.page_type == 'product' -%}
+  {%- render 'schema-product' -%}
+{%- elsif request.page_type == 'article' -%}
+  {%- render 'schema-article' -%}
+{%- endif -%}

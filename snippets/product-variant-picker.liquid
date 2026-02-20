@@ -1,0 +1,71 @@
+{% comment %}
+  Renders product variant-picker
+
+  Accepts:
+  - product: {Object} product object.
+  - block: {Object} passing the block information.
+  - product_form_id: {String} Id of the product form to which the variant picker is associated.
+  - update_url: {Boolean} whether or not to update url when changing variants. If false, the url isn't updated. Default: true (optional).
+  Usage:
+  {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+{% endcomment %}
+{%- unless product.has_only_default_variant -%}
+  <variant-selects
+    id="variant-selects-{{ section.id }}"
+    class="w-full flex flex-col gap-y-5"
+    data-section="{{ section.id }}"
+    data-url="{{ product.url }}"
+    {% if update_url == false %}
+      data-update-url="false"
+    {% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign picker_type = 'button'
+        assign swatch_count = option.values | map: 'swatch' | compact | size
+
+        if swatch_count > 0 and block.settings.swatch_shape != 'none'
+          assign picker_type = 'swatch'
+        endif
+      -%}
+
+      {%- if picker_type == 'swatch' -%}
+        <fieldset class="js product-form__input flex flex-col gap-y-1">
+          <legend class="form__label mb-2">
+            <span>{{ option.name }}: </span>
+            <span data-selected-swatch-value="{{ option.name }}">
+              {{- option.selected_value -}}
+            </span>
+          </legend>
+
+          <div class="flex flex-row flex-wrap gap-3">
+            {%- render 'product-variant-options',
+              product: product,
+              option: option,
+              block: block,
+              picker_type: picker_type
+            -%}
+          </div>
+        </fieldset>
+      {%- elsif picker_type == 'button' -%}
+        <fieldset class="js product-form__input flex flex-col gap-y-1">
+          <legend class="form__label mb-2">{{ option.name }}</legend>
+
+          <div class="flex flex-row flex-wrap gap-3">
+            {%- render 'product-variant-options',
+              product: product,
+              option: option,
+              block: block,
+              picker_type: picker_type
+            -%}
+          </div>
+        </fieldset>
+      {%- endif -%}
+    {%- endfor -%}
+
+    <script type="application/json">
+      {{ product.variants | json }}
+    </script>
+  </variant-selects>
+{%- endunless -%}

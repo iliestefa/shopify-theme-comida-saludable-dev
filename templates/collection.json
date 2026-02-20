@@ -1,0 +1,30 @@
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "color_scheme": "scheme-4",
+        "show_collection_description": true,
+        "show_collection_image": true
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "products_per_page": 6,
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "show_secondary_image": true,
+        "show_vendor": true,
+        "quick_add": "standard",
+        "enable_filtering": true,
+        "enable_sorting": true
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "product-grid"
+  ]
+}
